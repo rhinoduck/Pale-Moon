@@ -19,6 +19,10 @@ CRCCheck on
 
 RequestExecutionLevel user
 
+Unicode true
+ManifestSupportedOS all
+ManifestDPIAware true
+
 !addplugindir ./
 
 ; On Vista and above attempt to elevate Standard Users in addition to users that

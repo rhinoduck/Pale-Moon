@@ -21,6 +21,10 @@ CRCCheck on
 
 RequestExecutionLevel user
 
+Unicode true
+ManifestSupportedOS all
+ManifestDPIAware true
+
 !addplugindir ./
 
 Var TmpVal
