@@ -448,6 +448,13 @@ static nsDefaultMimeTypeEntry defaultMimeEntries [] =
   { TEXT_CSS, "css" },
   { IMAGE_JPEG, "jpeg" },
   { IMAGE_JPEG, "jpg" },
+  // TODO: [rhinoduck] Should this be in a different position? It was place here
+  //       in the jxr example, but I have no knowledge of what "end extensions
+  //       used during startup" mentioned above means and how it affects the
+  //       entries.
+  { IMAGE_JPEG_XR, "jxr" },
+  { IMAGE_JPEG_XR, "hdp" },
+  { IMAGE_JPEG_XR, "wdp" },
   { IMAGE_SVG_XML, "svg" },
   { TEXT_HTML, "html" },
   { TEXT_HTML, "htm" },
@@ -522,6 +529,10 @@ static nsExtraMimeTypeEntry extraMimeEntries [] =
   { IMAGE_GIF, "gif", "GIF Image" },
   { IMAGE_ICO, "ico,cur", "ICO Image" },
   { IMAGE_JPEG, "jpeg,jpg,jfif,pjpeg,pjp", "JPEG Image" },
+  // TODO: [rhinoduck] Only the "jxr" extension is present here in the jxr
+  //       example. Find out if all three should/could be here or if it should
+  //       be just the one.
+  { IMAGE_JPEG_XR, "jxr,hdp,wdp", "JPEG-XR Image" },
   { IMAGE_PNG, "png", "PNG Image" },
   { IMAGE_TIFF, "tiff,tif", "TIFF Image" },
   { IMAGE_XBM, "xbm", "XBM Image" },

@@ -69,6 +69,7 @@ static const mozilla::Module::ContractIDEntry kImageContracts[] = {
 static const mozilla::Module::CategoryEntry kImageCategories[] = {
   { "Goanna-Content-Viewers", IMAGE_GIF, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_JPEG, "@mozilla.org/content/document-loader-factory;1" },
+  { "Goanna-Content-Viewers", IMAGE_JPEG_XR, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_PJPEG, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_JPG, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_ICO, "@mozilla.org/content/document-loader-factory;1" },

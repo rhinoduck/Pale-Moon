@@ -1,0 +1,43 @@
+# -*- Mode: python; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+toolkit = CONFIG['MOZ_WIDGET_TOOLKIT']
+
+# DUCK: Fixed up the retarded folder structure.
+# These files cannot be built in unified mode because they want to force NSPR
+# logging.
+SOURCES += [
+    'decode/decode.c',
+    'decode/postprocess.c',
+    'decode/segdec.c',
+    'decode/strdec.c',
+#    'decode/strdec_x86.c', # DUCK: Why was this commented out in jxr?
+    'decode/strInvTransform.c',
+    'decode/strPredQuantDec.c',
+    'jxrglue/JXRGlue.c',
+    'jxrglue/JXRGlueDec.c',
+    'jxrglue/JXRGluePFC.c',
+    'jxrglue/JXRMeta.c',
+    'sys/adapthuff.c',
+    'sys/image.c',
+    'sys/strcodec.c',
+    'sys/strPredQuant.c',
+    'sys/strTransform.c',
+]
+
+FAIL_ON_WARNINGS = False
+
+# JPEG-XR decoder needs header files located in these directories
+LOCAL_INCLUDES += [
+    '/image/jxrlib/image/sys',
+    '/image/jxrlib/include',
+    '/image/jxrlib/jxrglue',
+]
+
+DEFINES['DISABLE_PERF_MEASUREMENT'] = True
+
+# DUCK: Was 'imglib2' in the jxr example.
+FINAL_LIBRARY = 'xul'

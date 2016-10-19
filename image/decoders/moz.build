@@ -33,6 +33,7 @@ UNIFIED_SOURCES += [
 SOURCES += [
     'nsBMPDecoder.cpp',
     'nsJPEGDecoder.cpp',
+    'nsJPEGXRDecoder.cpp',
     'nsPNGDecoder.cpp',
     'nsWEBPDecoder.cpp',
 ]
@@ -41,6 +42,17 @@ FAIL_ON_WARNINGS = True
 
 SOURCES += [
     'iccjpeg.c',
+]
+
+# TODO: [rhinoduck] This will probably be reorganised. The directory structure
+#       in moz.build files coming from the jxr example looked more like abstract
+#       art than an attempt at placing things in sensible locations and actually
+#       have them work at all.
+# JPEG-XR decoder needs header files located in these directories
+LOCAL_INCLUDES += [
+    '/image/jxrlib/image/sys',
+    '/image/jxrlib/include',
+    '/image/jxrlib/jxrglue',
 ]
 
 # Decoders need RasterImage.h
