@@ -241,7 +241,8 @@ typedef long ERR;
 
 #define CT_ASSERT(exp, uniq) typedef char __CT_ASSERT__##uniq[(exp) ? 1 : -1] // Caller must provide a unique tag, or this fails to compile under GCC
 
-#if defined(_DEBUG) || defined(DBG)
+// TODO: Testing! Remove '1'!
+#if defined(_DEBUG) || defined(DBG) || 1
 #define JXR_Report(err, szExp, szFile, nLine) \
     fprintf(stderr, "FAILED: %ld=%s" CRLF, (err), (szExp)); \
     fprintf(stderr, "        %s:%ld" CRLF, (szFile), (nLine));  \

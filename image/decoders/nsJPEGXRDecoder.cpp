@@ -372,7 +372,21 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
         m_xfPixelFormat = m_outPixelFormat;
     }
 
+    puts("FART!");
     err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
+    printf("GUID: %lX %lX %lX %lX\n",
+        ((unsigned long *) &srcFmtGUID)[0],
+        ((unsigned long *) &srcFmtGUID)[1],
+        ((unsigned long *) &srcFmtGUID)[2],
+        ((unsigned long *) &srcFmtGUID)[3]
+    );
+    printf("dst: %lX %lX %lX %lX\n",
+        ((unsigned long *) &outFmt)[0],
+        ((unsigned long *) &outFmt)[1],
+        ((unsigned long *) &outFmt)[2],
+        ((unsigned long *) &outFmt)[3]
+    );
+    puts("FART!");
 
     if (WMP_errSuccess != err)
     {
@@ -393,8 +407,22 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
             m_outPixelFormat = pfBGR24;
             break;
         }
-
+        
+        puts("UGH!");
         err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
+        printf("src: %lX %lX %lX %lX\n",
+            ((unsigned long *) &srcFmtGUID)[0],
+            ((unsigned long *) &srcFmtGUID)[1],
+            ((unsigned long *) &srcFmtGUID)[2],
+            ((unsigned long *) &srcFmtGUID)[3]
+        );
+        printf("dst: %lX %lX %lX %lX\n",
+            ((unsigned long *) &outFmt)[0],
+            ((unsigned long *) &outFmt)[1],
+            ((unsigned long *) &outFmt)[2],
+            ((unsigned long *) &outFmt)[3]
+        );
+        puts("UGH!");
 
         if (WMP_errSuccess != err)
             return;
@@ -508,8 +536,10 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
         srcFmtGUID = GUID_PKPixelFormat16bppGrayHalf;
     else
         return; // format not suported
-
+    
+    puts("HRNGH!");
     err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, GUID_PKPixelFormat8bppGray);
+    puts("HRNGH!");
 
     if (WMP_errSuccess != err)
         return;
