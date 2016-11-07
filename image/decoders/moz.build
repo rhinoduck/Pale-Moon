@@ -33,6 +33,7 @@ UNIFIED_SOURCES += [
 SOURCES += [
     'nsBMPDecoder.cpp',
     'nsJPEGDecoder.cpp',
+    'nsJPEGXRDecoder.cpp',
     'nsPNGDecoder.cpp',
     'nsWEBPDecoder.cpp',
 ]

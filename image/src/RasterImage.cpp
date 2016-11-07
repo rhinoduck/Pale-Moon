@@ -27,6 +27,7 @@
 #include "nsPNGDecoder.h"
 #include "nsGIFDecoder2.h"
 #include "nsJPEGDecoder.h"
+#include "nsJPEGXRDecoder.h"
 #include "nsBMPDecoder.h"
 #include "nsICODecoder.h"
 #include "nsIconDecoder.h"
@@ -1331,6 +1332,9 @@ RasterImage::CreateDecoder(const Maybe<nsIntSize>& aSize, uint32_t aFlags)
       decoder = new nsJPEGDecoder(this,
                                   mHasBeenDecoded ? Decoder::SEQUENTIAL :
                                                     Decoder::PROGRESSIVE);
+      break;
+    case eDecoderType_jpeg_xr:
+      decoder = new nsJPEGXRDecoder(this, mHasBeenDecoded);
       break;
     case eDecoderType_bmp:
       decoder = new nsBMPDecoder(this);
