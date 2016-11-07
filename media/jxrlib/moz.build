@@ -11,7 +11,7 @@ EXPORTS.jxrlib += [
 ]
 
 LOCAL_INCLUDES += [
-    # 'common/include',
+    'common/include',
     'image/decode',
     'image/sys',
     'image/x86',
