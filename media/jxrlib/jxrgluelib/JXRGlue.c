@@ -257,7 +257,7 @@ ERR PixelFormatLookup(PKPixelInfo* pPI, U8 uLookupType)
             }
         }
     }
-    JXR_Call(WMP_errUnsupportedFormat);
+    Call(WMP_errUnsupportedFormat);
 
 Cleanup:
     return err;        
@@ -307,7 +307,7 @@ static ERR GetIIDInfo(const char* szExt, const PKIIDInfo** ppInfo)
         }
     }
 
-    JXR_Call(WMP_errUnsupportedFormat);
+    Call(WMP_errUnsupportedFormat);
 
 Cleanup:
     return err;
@@ -319,7 +319,7 @@ ERR GetImageEncodeIID(const char* szExt, const PKIID** ppIID)
 
     const PKIIDInfo* pInfo = NULL;
 
-    JXR_Call(GetIIDInfo(szExt, &pInfo));
+    Call(GetIIDInfo(szExt, &pInfo));
     *ppIID = pInfo->pIIDEnc;
 
 Cleanup:
@@ -332,7 +332,7 @@ ERR GetImageDecodeIID(const char* szExt, const PKIID** ppIID)
 
     const PKIIDInfo* pInfo = NULL;
 
-    JXR_Call(GetIIDInfo(szExt, &pInfo));
+    Call(GetIIDInfo(szExt, &pInfo));
     *ppIID = pInfo->pIIDDec;
 
 Cleanup:
@@ -346,7 +346,7 @@ ERR PKCreateFactory_CreateStream(PKStream** ppStream)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(PKAlloc((void **) ppStream, sizeof(**ppStream)));
+    Call(PKAlloc((void **) ppStream, sizeof(**ppStream)));
 
 Cleanup:
     return err;
@@ -356,7 +356,7 @@ ERR PKCreateFactory_Release(PKFactory** ppFactory)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(PKFree((void **) ppFactory));
+    Call(PKFree((void **) ppFactory));
 
 Cleanup: 
     return err;
@@ -370,7 +370,7 @@ ERR PKCreateFactory(PKFactory** ppFactory, U32 uVersion)
 
     UNREFERENCED_PARAMETER( uVersion );
 
-    JXR_Call(PKAlloc((void **) ppFactory, sizeof(**ppFactory)));
+    Call(PKAlloc((void **) ppFactory, sizeof(**ppFactory)));
     pFactory = *ppFactory;
 
     pFactory->CreateStream = PKCreateFactory_CreateStream;
@@ -395,15 +395,15 @@ ERR PKCodecFactory_CreateCodec(const PKIID* iid, void** ppv)
 
     if (IID_PKImageWmpEncode == *iid)
     {
-        JXR_Call(PKImageEncode_Create_WMP((PKImageEncode**)ppv));
+        Call(PKImageEncode_Create_WMP((PKImageEncode**)ppv));
     }
     else if (IID_PKImageWmpDecode == *iid)
     {
-        JXR_Call(PKImageDecode_Create_WMP((PKImageDecode**)ppv));
+        Call(PKImageDecode_Create_WMP((PKImageDecode**)ppv));
     }
     else
     {
-        JXR_Call(WMP_errUnsupportedFormat);
+        Call(WMP_errUnsupportedFormat);
     }
 
 Cleanup:
@@ -423,20 +423,20 @@ ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode**
 
     // get file extension
     pExt = strrchr(szFilename, '.');
-    JXR_FailIf(NULL == pExt, WMP_errUnsupportedFormat);
+    FailIf(NULL == pExt, WMP_errUnsupportedFormat);
 
     // get decode PKIID
-    JXR_Call(GetImageDecodeIID(pExt, &pIID));
+    Call(GetImageDecodeIID(pExt, &pIID));
 
     // create stream
-    JXR_Call(CreateWS_File(&pStream, szFilename, "rb"));
+    Call(CreateWS_File(&pStream, szFilename, "rb"));
 
     // Create decoder
-    JXR_Call(PKCodecFactory_CreateCodec(pIID, (void **) ppDecoder));
+    Call(PKCodecFactory_CreateCodec(pIID, (void **) ppDecoder));
     pDecoder = *ppDecoder;
 
     // attach stream to decoder
-    JXR_Call(pDecoder->Initialize(pDecoder, pStream));
+    Call(pDecoder->Initialize(pDecoder, pStream));
     pDecoder->fStreamOwner = !0;
 
 Cleanup:
@@ -450,7 +450,7 @@ ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter)
     ERR err = WMP_errSuccess;
     PKFormatConverter* pFC = NULL;
 
-    JXR_Call(PKAlloc((void **) ppFConverter, sizeof(**ppFConverter)));
+    Call(PKAlloc((void **) ppFConverter, sizeof(**ppFConverter)));
     pFC = *ppFConverter;
 
     pFC->Initialize = PKFormatConverter_Initialize;
@@ -472,7 +472,7 @@ ERR PKCreateCodecFactory_Release(PKCodecFactory** ppCFactory)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(PKFree((void **) ppCFactory));
+    Call(PKFree((void **) ppCFactory));
 
 Cleanup:
     return err;
@@ -485,7 +485,7 @@ ERR PKCreateCodecFactory(PKCodecFactory** ppCFactory, U32 uVersion)
 
     UNREFERENCED_PARAMETER( uVersion );
 
-    JXR_Call(PKAlloc((void **) ppCFactory, sizeof(**ppCFactory)));
+    Call(PKAlloc((void **) ppCFactory, sizeof(**ppCFactory)));
     pCFactory = *ppCFactory;
 
     pCFactory->CreateCodec = NULL; //PKCodecFactory_CreateCodec;
@@ -520,7 +520,7 @@ ERR PKImageEncode_Initialize(
 
 //#if defined(_DEBUG) || defined(DEBUG)
     // This field is not used anywhere (accept assigned here)
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &pIE->offStart));
+    Call(pIE->pStream->GetPos(pIE->pStream, &pIE->offStart));
 //#endif // DEBUG
 
 //#if defined(_DEBUG) || defined(DEBUG)
@@ -623,16 +623,16 @@ ERR PKImageEncode_WriteSource(
 	// CWMTranscodingParam* pParam = NULL; 
 
     // get pixel format
-    JXR_Call(pFC->GetSourcePixelFormat(pFC, &enPFFrom));
-    JXR_Call(pFC->GetPixelFormat(pFC, &enPFTo));
-    JXR_FailIf(!IsEqualGUID(&pIE->guidPixFormat, &enPFTo), WMP_errUnsupportedFormat);
+    Call(pFC->GetSourcePixelFormat(pFC, &enPFFrom));
+    Call(pFC->GetPixelFormat(pFC, &enPFTo));
+    FailIf(!IsEqualGUID(&pIE->guidPixFormat, &enPFTo), WMP_errUnsupportedFormat);
 
     // calc common stride
-//    JXR_Call(GetPixelInfo(enPFFrom, &pPIFrom));
+//    Call(GetPixelInfo(enPFFrom, &pPIFrom));
     pPIFrom.pGUIDPixFmt = &enPFFrom;
     PixelFormatLookup(&pPIFrom, LOOKUP_FORWARD);
 
-//    JXR_Call(GetPixelInfo(enPFTo, &pPITo));
+//    Call(GetPixelInfo(enPFTo, &pPITo));
     pPITo.pGUIDPixFmt = &enPFTo;
     PixelFormatLookup(&pPITo, LOOKUP_FORWARD);
 
@@ -651,11 +651,11 @@ ERR PKImageEncode_WriteSource(
     cbStride = max(cbStrideFrom, cbStrideTo);
 
     // actual dec/enc with local buffer
-    JXR_Call(PKAllocAligned((void **) &pb, cbStride * pRect->Height, 128));
+    Call(PKAllocAligned((void **) &pb, cbStride * pRect->Height, 128));
 
-    JXR_Call(pFC->Copy(pFC, pRect, pb, cbStride));
+    Call(pFC->Copy(pFC, pRect, pb, cbStride));
 
-	JXR_Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
+	Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
 
 Cleanup:
     PKFreeAligned((void **) &pb);
@@ -708,16 +708,16 @@ ERR PKImageEncode_Transcode(
     CWMTranscodingParam cParam = {0}; 
 
     // get pixel format
-    JXR_Call(pFC->GetSourcePixelFormat(pFC, &enPFFrom));
-    JXR_Call(pFC->GetPixelFormat(pFC, &enPFTo));
-    JXR_FailIf(!IsEqualGUID(&pIE->guidPixFormat, &enPFTo), WMP_errUnsupportedFormat);
+    Call(pFC->GetSourcePixelFormat(pFC, &enPFFrom));
+    Call(pFC->GetPixelFormat(pFC, &enPFTo));
+    FailIf(!IsEqualGUID(&pIE->guidPixFormat, &enPFTo), WMP_errUnsupportedFormat);
 
     // calc common stride
-//    JXR_Call(GetPixelInfo(enPFFrom, &pPIFrom));
+//    Call(GetPixelInfo(enPFFrom, &pPIFrom));
     pPIFrom.pGUIDPixFmt = &enPFFrom;
     PixelFormatLookup(&pPIFrom, LOOKUP_FORWARD);
 
-//    JXR_Call(GetPixelInfo(enPFTo, &pPITo));
+//    Call(GetPixelInfo(enPFTo, &pPITo));
     pPITo.pGUIDPixFmt = &enPFTo;
     PixelFormatLookup(&pPITo, LOOKUP_FORWARD);
 
@@ -747,14 +747,14 @@ ERR PKImageEncode_Transcode(
         cParam.sbSubband = pFC->pDecoder->WMP.wmiSCP.sbSubband;
         cParam.bIgnoreOverlap = pFC->pDecoder->WMP.bIgnoreOverlap;
         
-        JXR_Call(pIE->Transcode(pIE, pFC->pDecoder, &cParam));
+        Call(pIE->Transcode(pIE, pFC->pDecoder, &cParam));
     }
 	else 
 	{
 		// actual dec/enc with local buffer
-	    JXR_Call(PKAllocAligned((void **) &pb, cbStride * pRect->Height, 128));
-		JXR_Call(pFC->Copy(pFC, pRect, pb, cbStride));
-		JXR_Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
+	    Call(PKAllocAligned((void **) &pb, cbStride * pRect->Height, 128));
+		Call(pFC->Copy(pFC, pRect, pb, cbStride));
+		Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
 	}
 
 Cleanup:
@@ -790,7 +790,7 @@ ERR PKImageEncode_Create(PKImageEncode** ppIE)
     ERR err = WMP_errSuccess;
     PKImageEncode* pIE = NULL;
 
-    JXR_Call(PKAlloc((void **) ppIE, sizeof(**ppIE)));
+    Call(PKAlloc((void **) ppIE, sizeof(**ppIE)));
 
     pIE = *ppIE;
     pIE->Initialize = PKImageEncode_Initialize;
@@ -933,7 +933,7 @@ ERR PKImageDecode_Create(
     ERR err = WMP_errSuccess;
     PKImageDecode* pID = NULL;
 
-    JXR_Call(PKAlloc((void **) ppID, sizeof(**ppID)));
+    Call(PKAlloc((void **) ppID, sizeof(**ppID)));
 
     pID = *ppID;
     pID->Initialize = PKImageDecode_Initialize;

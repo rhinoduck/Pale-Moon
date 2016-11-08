@@ -33,10 +33,12 @@ UNIFIED_SOURCES += [
 SOURCES += [
     'nsBMPDecoder.cpp',
     'nsJPEGDecoder.cpp',
-    'nsJPEGXRDecoder.cpp',
     'nsPNGDecoder.cpp',
     'nsWEBPDecoder.cpp',
 ]
+
+if CONFIG['MOZ_JXR'] or CONFIG['MOZ_NATIVE_JXR']:
+    SOURCES += ['nsJPEGXRDecoder.cpp']
 
 FAIL_ON_WARNINGS = True
 

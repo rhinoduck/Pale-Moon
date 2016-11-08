@@ -69,10 +69,10 @@ static ERR ParsePFDEntry(
         {
             unsigned char *pGuid = (unsigned char *) &pID->guidPixFormat;
             /** following code is endian-agnostic **/
-            JXR_Call(GetULong(pWS, uValue, (U32 *)pGuid));
-            JXR_Call(GetUShort(pWS, uValue + 4, (unsigned short *)(pGuid + 4)));
-            JXR_Call(GetUShort(pWS, uValue + 6, (unsigned short *)(pGuid + 6)));
-            JXR_Call(pWS->Read(pWS, pGuid + 8, 8));
+            Call(GetULong(pWS, uValue, (U32 *)pGuid));
+            Call(GetUShort(pWS, uValue + 4, (unsigned short *)(pGuid + 4)));
+            Call(GetUShort(pWS, uValue + 6, (unsigned short *)(pGuid + 6)));
+            Call(pWS->Read(pWS, pGuid + 8, 8));
                 
             PI.pGUIDPixFmt = &pID->guidPixFormat;
             PixelFormatLookup(&PI, LOOKUP_FORWARD);
@@ -85,52 +85,52 @@ static ERR ParsePFDEntry(
         }
 
         case WMP_tagTransformation:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             assert(uValue < O_MAX);
             pID->WMP.fOrientationFromContainer = TRUE;
             pID->WMP.oOrientationFromContainer = uValue;
             break;
 
         case WMP_tagImageWidth:
-            JXR_FailIf(0 == uValue, WMP_errUnsupportedFormat);
+            FailIf(0 == uValue, WMP_errUnsupportedFormat);
             pID->uWidth = uValue;
             break;
 
         case WMP_tagImageHeight:
-            JXR_FailIf(0 == uValue, WMP_errUnsupportedFormat);
+            FailIf(0 == uValue, WMP_errUnsupportedFormat);
             pID->uHeight = uValue;
             break;
 
         case WMP_tagImageOffset:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             pID->WMP.wmiDEMisc.uImageOffset = uValue;
             break;
 
         case WMP_tagImageByteCount:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             pID->WMP.wmiDEMisc.uImageByteCount = uValue;
             pID->WMP.wmiI.uImageByteCount = uValue;
             break;
 
         case WMP_tagAlphaOffset:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             pID->WMP.wmiDEMisc.uAlphaOffset = uValue;
             break;
 
         case WMP_tagAlphaByteCount:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             pID->WMP.wmiDEMisc.uAlphaByteCount = uValue;
             pID->WMP.wmiI_Alpha.uImageByteCount = uValue;
             break;
 
         case WMP_tagWidthResolution:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             ufValue.uVal = uValue; 
             pID->fResX = ufValue.fVal;
             break;
 
         case WMP_tagHeightResolution:
-            JXR_FailIf(1 != uCount, WMP_errUnsupportedFormat);
+            FailIf(1 != uCount, WMP_errUnsupportedFormat);
             ufValue.uVal = uValue; 
             pID->fResY = ufValue.fVal;
             break;
@@ -147,12 +147,12 @@ static ERR ParsePFDEntry(
 
         case WMP_tagEXIFMetadata:
             pID->WMP.wmiDEMisc.uEXIFMetadataOffset = uValue;
-            JXR_CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uEXIFMetadataByteCount));
+            CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uEXIFMetadataByteCount));
             break;
 
         case WMP_tagGPSInfoMetadata:
             pID->WMP.wmiDEMisc.uGPSInfoMetadataOffset = uValue;
-            JXR_CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uGPSInfoMetadataByteCount));
+            CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uGPSInfoMetadataByteCount));
             break;
 
         case WMP_tagIPTCNAAMetadata:
@@ -173,61 +173,61 @@ static ERR ParsePFDEntry(
 
         // Descriptive Metadata
         case WMP_tagImageDescription:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarImageDescription));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarImageDescription.vt);
             break;
 
         case WMP_tagCameraMake:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCameraMake));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCameraMake.vt);
             break;
 
         case WMP_tagCameraModel:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCameraModel));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCameraModel.vt);
             break;
 
         case WMP_tagSoftware:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarSoftware));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarSoftware.vt);
             break;
 
         case WMP_tagDateTime:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarDateTime));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarDateTime.vt);
             break;
 
         case WMP_tagArtist:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarArtist));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarArtist.vt);
             break;
 
         case WMP_tagCopyright:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCopyright));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCopyright.vt);
             break;
 
         case WMP_tagRatingStars:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarRatingStars));
             assert(DPKVT_UI2 == pID->WMP.sDescMetadata.pvarRatingStars.vt);
             break;
 
         case WMP_tagRatingValue:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarRatingValue));
             assert(DPKVT_UI2 == pID->WMP.sDescMetadata.pvarRatingValue.vt);
             break;
 
         case WMP_tagCaption:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCaption));
             assert((DPKVT_BYREF | DPKVT_UI1) == pID->WMP.sDescMetadata.pvarCaption.vt);
 
@@ -241,25 +241,25 @@ static ERR ParsePFDEntry(
             break;
 
         case WMP_tagDocumentName:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarDocumentName));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarDocumentName.vt);
             break;
 
         case WMP_tagPageName:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarPageName));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarPageName.vt);
             break;
 
         case WMP_tagPageNumber:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarPageNumber));
             assert(DPKVT_UI4 == pID->WMP.sDescMetadata.pvarPageNumber.vt);
             break;
 
         case WMP_tagHostComputer:
-            JXR_CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarHostComputer));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarHostComputer.vt);
             break;
@@ -290,12 +290,12 @@ static ERR ParsePFD(
         U32 uCount = 0;
         U32 uValue = 0;
 
-        JXR_Call(GetUShort(pWS, offPos, &uTag)); offPos += 2;
-        JXR_Call(GetUShort(pWS, offPos, &uType)); offPos += 2;
-        JXR_Call(GetULong(pWS, offPos, &uCount)); offPos += 4;
-        JXR_Call(GetULong(pWS, offPos, &uValue)); offPos += 4;
+        Call(GetUShort(pWS, offPos, &uTag)); offPos += 2;
+        Call(GetUShort(pWS, offPos, &uType)); offPos += 2;
+        Call(GetULong(pWS, offPos, &uCount)); offPos += 4;
+        Call(GetULong(pWS, offPos, &uValue)); offPos += 4;
 
-        JXR_Call(ParsePFDEntry(pID, uTag, uType, uCount, uValue)); 
+        Call(ParsePFDEntry(pID, uTag, uType, uCount, uValue)); 
     }
 
     pID->WMP.bHasAlpha = ((pID->WMP.bHasAlpha) && (pID->WMP.wmiDEMisc.uAlphaOffset != 0) && (pID->WMP.wmiDEMisc.uAlphaByteCount != 0));//has planar alpha
@@ -319,29 +319,29 @@ ERR ReadContainer(
     U8 bVersion;
     
     //================================
-    JXR_Call(pWS->GetPos(pWS, &offPos));
-    JXR_FailIf(0 != offPos, WMP_errUnsupportedFormat);
+    Call(pWS->GetPos(pWS, &offPos));
+    FailIf(0 != offPos, WMP_errUnsupportedFormat);
 
     //================================
     // Header
-    JXR_Call(pWS->Read(pWS, szSig, sizeof(szSig))); offPos += 2;
-    JXR_FailIf(szSig != strstr(szSig, "II"), WMP_errUnsupportedFormat);
+    Call(pWS->Read(pWS, szSig, sizeof(szSig))); offPos += 2;
+    FailIf(szSig != strstr(szSig, "II"), WMP_errUnsupportedFormat);
 
-    JXR_Call(GetUShort(pWS, offPos, &uWmpID)); offPos += 2;
-    JXR_FailIf(WMP_valWMPhotoID != (0x00FF & uWmpID), WMP_errUnsupportedFormat);
+    Call(GetUShort(pWS, offPos, &uWmpID)); offPos += 2;
+    FailIf(WMP_valWMPhotoID != (0x00FF & uWmpID), WMP_errUnsupportedFormat);
 
     // We accept version 00 and version 01 bitstreams - all others rejected
     bVersion = (0xFF00 & uWmpID) >> 8;
-    JXR_FailIf(bVersion != 0 && bVersion != 1, WMP_errUnsupportedFormat);
+    FailIf(bVersion != 0 && bVersion != 1, WMP_errUnsupportedFormat);
 
-    JXR_Call(GetULong(pWS, offPos, &offPFD)); offPos += 4;
+    Call(GetULong(pWS, offPos, &offPFD)); offPos += 4;
 
     //================================
     // PFD
     offPos = (size_t)offPFD;
-    JXR_Call(GetUShort(pWS, offPos, &cPFDEntry)); offPos += 2;
-    JXR_FailIf(0 == cPFDEntry || USHRT_MAX == cPFDEntry, WMP_errUnsupportedFormat);
-    JXR_Call(ParsePFD(pID, offPos, cPFDEntry));
+    Call(GetUShort(pWS, offPos, &cPFDEntry)); offPos += 2;
+    FailIf(0 == cPFDEntry || USHRT_MAX == cPFDEntry, WMP_errUnsupportedFormat);
+    Call(ParsePFD(pID, offPos, cPFDEntry));
 
 Cleanup:
     return err;
@@ -358,12 +358,12 @@ ERR PKImageDecode_Initialize_WMP(
     CWMImageInfo* pII = NULL;
 
     //================================
-    JXR_Call(PKImageDecode_Initialize(pID, pWS));
+    Call(PKImageDecode_Initialize(pID, pWS));
 
     //================================
-    JXR_Call(ReadContainer(pID));
+    Call(ReadContainer(pID));
 
-    JXR_Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset)); // Moved here from ReadContainer()
+    Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset)); // Moved here from ReadContainer()
 
     //================================
     pID->WMP.wmiSCP.pWStream = pWS;
@@ -377,7 +377,7 @@ ERR PKImageDecode_Initialize_WMP(
     pID->WMP.cLinesCropped_Alpha = 0;
     pID->WMP.fFirstNonZeroDecode_Alpha = FALSE;
 
-    JXR_FailIf(ICERR_OK != ImageStrDecGetInfo(&pID->WMP.wmiI, &pID->WMP.wmiSCP), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrDecGetInfo(&pID->WMP.wmiI, &pID->WMP.wmiSCP), WMP_errFail);
 
     pII = &pID->WMP.wmiI;
 
@@ -432,7 +432,7 @@ ERR PKImageDecode_GetRawStream_WMP(
     struct WMPStream* pWS = pID->pStream;
 
     *ppWS = NULL;
-    JXR_Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset));
+    Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset));
     *ppWS = pWS;
 
 Cleanup:
@@ -499,7 +499,7 @@ ERR JXR_BeginDecodingMBRows(
     // In "Low Memory mode" (i.e. when the decode buffer can fit only one macroblock row), 
     // we don't have full frame buffer. We therefore cannot rotate the image.
     // We can flip H, V and HV, but no rotations.
-    JXR_FailIf(!fullROIBuffer && pWMII->oOrientation >= O_RCW, WMP_errFail);
+    FailIf(!fullROIBuffer && pWMII->oOrientation >= O_RCW, WMP_errFail);
 
     // Set Region of Interest
     if (NULL == pRect) // the user did not specify ROI
@@ -543,12 +543,12 @@ ERR JXR_BeginDecodingMBRows(
         assert(pID->WMP.wmiDEMisc.uImageOffset >= pID->offStart);
         pos = pID->WMP.wmiDEMisc.uImageOffset - pID->offStart;
         pID->WMP.wmiSCP.uStreamImageOffset = pos;
-        JXR_Call(pID->WMP.wmiSCP.pWStream->SetPos(pID->WMP.wmiSCP.pWStream, pos));
+        Call(pID->WMP.wmiSCP.pWStream->SetPos(pID->WMP.wmiSCP.pWStream, pos));
 
 #ifdef WEB_CLIENT_SUPPORT
-        JXR_FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride, failSafe), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride, failSafe), WMP_errFail);
 #else
-        JXR_FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride), WMP_errFail);
 #endif
 
         if (pID->WMP.bHasAlpha) // planar alpha
@@ -726,7 +726,7 @@ ERR JXR_BeginDecodingMBRows_Alpha(
     // In "Low Memory mode" (i.e. when the decode buffer can fit only one macroblock row), 
     // we don't have full frame buffer. We therefore cannot rotate the image.
     // We can flip H, V and HV, but no rotations.
-    JXR_FailIf(!fullROIBuffer && pWMII->oOrientation >= O_RCW, WMP_errFail);
+    FailIf(!fullROIBuffer && pWMII->oOrientation >= O_RCW, WMP_errFail);
 
     // Normally, dimensions for alpha plane are set in the caller of this function.
     // If not set, get them from the tags in the file header
@@ -773,7 +773,7 @@ ERR JXR_BeginDecodingMBRows_Alpha(
     pos = pID->WMP.wmiDEMisc.uAlphaOffset - pID->offStart;
     pID->WMP.wmiSCP_Alpha.uStreamImageOffset = pos;
 
-    JXR_Call(pWS->SetPos(pWS, pos));
+    Call(pWS->SetPos(pWS, pos));
 
     switch (pID->WMP.wmiI.bdBitDepth) // bit depth of main image plane (not alpha plane)
     {
@@ -801,9 +801,9 @@ ERR JXR_BeginDecodingMBRows_Alpha(
     }
 
 #ifdef WEB_CLIENT_SUPPORT
-    JXR_FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride, failSafe), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride, failSafe), WMP_errFail);
 #else
-    JXR_FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride), WMP_errFail);
 #endif
 
 Cleanup:
@@ -933,9 +933,9 @@ ERR PKImageDecode_Copy_WMP(
     size_t numLinesDecoded;
 
 #ifdef WEB_CLIENT_SUPPORT
-    JXR_Call(JXR_BeginDecodingMBRows(pID, pRect, pb, cbStride, TRUE, FALSE)); // decoding into a full-ROI buffer, not fail-safe
+    Call(JXR_BeginDecodingMBRows(pID, pRect, pb, cbStride, TRUE, FALSE)); // decoding into a full-ROI buffer, not fail-safe
 #else
-    JXR_Call(JXR_BeginDecodingMBRows(pID, pRect, pb, cbStride, TRUE)); // decoding into a full-ROI buffer
+    Call(JXR_BeginDecodingMBRows(pID, pRect, pb, cbStride, TRUE)); // decoding into a full-ROI buffer
 #endif
 
     stepStride = cbStride;
@@ -957,7 +957,7 @@ ERR PKImageDecode_Copy_WMP(
     for (pRow = pStart; ; pRow += numLinesDecoded * stepStride)
     {
         Bool finished;
-        JXR_Call(JXR_DecodeNextMBRow(pID, pRow, cbStride, &numLinesDecoded, &finished));
+        Call(JXR_DecodeNextMBRow(pID, pRow, cbStride, &numLinesDecoded, &finished));
 
         if (0 == numLinesDecoded)
         {
@@ -988,7 +988,7 @@ ERR PKImageDecode_Copy_WMP(
         pos = pID->WMP.wmiDEMisc.uAlphaOffset - pID->offStart;
         pID->WMP.wmiSCP_Alpha.uStreamImageOffset = pos;
 
-        JXR_Call(pWS->SetPos(pWS, pos));
+        Call(pWS->SetPos(pWS, pos));
 
         pID->WMP.wmiSCP_Alpha.pWStream = pWS;
         ImageStrDecGetInfo(pWMII, &pID->WMP.wmiSCP_Alpha);
@@ -1004,9 +1004,9 @@ ERR PKImageDecode_Copy_WMP(
         // We also decode alpha plane from the same stream as main image plane.
         // Thumbnail size will be calculated in JXR_BeginDecodingMBRows_Alpha()
 #ifdef WEB_CLIENT_SUPPORT
-        JXR_Call(JXR_BeginDecodingMBRows_Alpha(pID, pRect, pb, cbStride, TRUE, FALSE));
+        Call(JXR_BeginDecodingMBRows_Alpha(pID, pRect, pb, cbStride, TRUE, FALSE));
 #else
-        JXR_Call(JXR_BeginDecodingMBRows_Alpha(pID, pRect, pb, cbStride, TRUE));
+        Call(JXR_BeginDecodingMBRows_Alpha(pID, pRect, pb, cbStride, TRUE));
 #endif
 
         alphaFinished = FALSE;
@@ -1018,7 +1018,7 @@ ERR PKImageDecode_Copy_WMP(
         for (pRow = pStart; ; pRow += numLinesDecoded * stepStride)
         {
             Bool finished;
-            JXR_Call(JXR_DecodeNextMBRow_Alpha(pID, pRow, cbStride, &numLinesDecoded, &finished));
+            Call(JXR_DecodeNextMBRow_Alpha(pID, pRow, cbStride, &numLinesDecoded, &finished));
 
             if (0 == numLinesDecoded)
             {
@@ -1116,12 +1116,12 @@ ERR PKImageDecode_Copy_WMP(
         assert(pID->WMP.wmiDEMisc.uImageOffset >= pID->offStart);
         pos = pID->WMP.wmiDEMisc.uImageOffset - pID->offStart;
         pID->WMP.wmiSCP.uStreamImageOffset = pos;
-        JXR_Call(pID->WMP.wmiSCP.pWStream->SetPos(pID->WMP.wmiSCP.pWStream, pos));
+        Call(pID->WMP.wmiSCP.pWStream->SetPos(pID->WMP.wmiSCP.pWStream, pos));
 
         pID->WMP.wmiSCP.fMeasurePerf = TRUE;
-        JXR_FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride), WMP_errFail);
-        JXR_FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC, &wmiBI, &numLinesCropped), WMP_errFail);
-        JXR_FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecInit(pWMII, &pID->WMP.wmiSCP, &pID->WMP.ctxSC, cbStride), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC, &wmiBI, &numLinesCropped), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC), WMP_errFail);
 
         pID->WMP.cLinesCropped = numLinesCropped;
 
@@ -1143,7 +1143,7 @@ ERR PKImageDecode_Copy_WMP(
         pos = pID->WMP.wmiDEMisc.uAlphaOffset - pID->offStart;
         pID->WMP.wmiSCP_Alpha.uStreamImageOffset = pos;
 
-        JXR_Call(pWS->SetPos(pWS, pos));
+        Call(pWS->SetPos(pWS, pos));
 
         ImageStrDecGetInfo(pWMII, &pID->WMP.wmiSCP_Alpha);
 
@@ -1195,9 +1195,9 @@ ERR PKImageDecode_Copy_WMP(
 
         pID->WMP.wmiSCP_Alpha.fMeasurePerf = TRUE;
 
-        JXR_FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride), WMP_errFail);
-        JXR_FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC_Alpha, &wmiBI, &numLinesCropped), WMP_errFail);
-        JXR_FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC_Alpha), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha, cbStride), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC_Alpha, &wmiBI, &numLinesCropped), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC_Alpha), WMP_errFail);
     }
 
     pID->WMP.cLinesCropped_Alpha = numLinesCropped;
@@ -1217,15 +1217,15 @@ ERR PKImageDecode_GetMetadata_WMP(PKImageDecode *pID, U32 uOffset, U32 uByteCoun
         struct WMPStream* pWS = pID->pStream;
         size_t iCurrPos;
 
-        JXR_FailIf(*pcbGot < uByteCount, WMP_errBufferOverflow);
-        JXR_Call(pWS->GetPos(pWS, &iCurrPos));
-        JXR_Call(pWS->SetPos(pWS, uOffset));
-        JXR_Call(pWS->Read(pWS, pbGot, uByteCount));
-        JXR_Call(pWS->SetPos(pWS, iCurrPos));
+        FailIf(*pcbGot < uByteCount, WMP_errBufferOverflow);
+        Call(pWS->GetPos(pWS, &iCurrPos));
+        Call(pWS->SetPos(pWS, uOffset));
+        Call(pWS->Read(pWS, pbGot, uByteCount));
+        Call(pWS->SetPos(pWS, iCurrPos));
     }
 
 Cleanup:
-    if (JXR_Failed(err))
+    if (Failed(err))
         *pcbGot = 0;
     else
         *pcbGot = uByteCount;
@@ -1278,7 +1278,7 @@ ERR PKImageDecode_Release_WMP(PKImageDecode** ppID)
     FreeDescMetadata(&pID->WMP.sDescMetadata.pvarHostComputer);
 
     // Release base class
-    JXR_Call(PKImageDecode_Release(ppID));
+    Call(PKImageDecode_Release(ppID));
 
 Cleanup:
     return err;
@@ -1291,7 +1291,7 @@ ERR PKImageDecode_Create_WMP(PKImageDecode** ppID)
     ERR err = WMP_errSuccess;
     PKImageDecode* pID = NULL;
 
-    JXR_Call(PKImageDecode_Create(ppID));
+    Call(PKImageDecode_Create(ppID));
 
     pID = *ppID;
     pID->Initialize = PKImageDecode_Initialize_WMP;

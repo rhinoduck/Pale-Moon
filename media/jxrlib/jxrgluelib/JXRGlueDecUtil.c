@@ -37,26 +37,26 @@ ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode**
 
     // get file extension
     pExt = strrchr(szFilename, '.');
-    JXR_FailIf(NULL == pExt, WMP_errUnsupportedFormat);
+    FailIf(NULL == pExt, WMP_errUnsupportedFormat);
 
     // get decode PKIID
-    JXR_Call(GetImageDecodeIID(pExt, &pIID));
+    Call(GetImageDecodeIID(pExt, &pIID));
 
     // create stream
-    JXR_Call(CreateWS_File(&pStream, szFilename, "rb"));
+    Call(CreateWS_File(&pStream, szFilename, "rb"));
 
     // Create decoder
 #if 0
-    JXR_Call(PKCodecFactory_CreateCodec(pIID, (void **) ppDecoder));
+    Call(PKCodecFactory_CreateCodec(pIID, (void **) ppDecoder));
 #else
     // We know we are creating a decoder here
-    JXR_Call(PKImageDecode_Create_WMP(ppDecoder));
+    Call(PKImageDecode_Create_WMP(ppDecoder));
 #endif
 
     pDecoder = *ppDecoder;
 
     // attach stream to decoder
-    JXR_Call(pDecoder->Initialize(pDecoder, pStream));
+    Call(pDecoder->Initialize(pDecoder, pStream));
     pDecoder->fStreamOwner = !0;
 
 Cleanup:

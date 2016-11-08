@@ -5170,6 +5170,57 @@ fi
 AC_SUBST(MOZ_WEBSPEECH)
 
 dnl ========================================================
+dnl = Enable JPEG-XR (JXR) decoder support
+dnl ========================================================
+MOZ_JXR=
+
+MOZ_ARG_ENABLE_BOOL(jxr,
+[  --enable-jxr          Enable support for JPEG-XR (JXR) image format (experimental)],
+    MOZ_JXR=1,
+    MOZ_JXR=)
+
+if test -n "$MOZ_JXR"; then
+    AC_DEFINE(MOZ_JXR)
+fi
+
+AC_SUBST(MOZ_JXR)
+
+dnl ========================================================
+dnl system JPEG-XR (JXR) support
+dnl ========================================================
+MOZ_NATIVE_JXR=
+
+MOZ_ARG_WITH_STRING(system-jxr,
+[  --with-system-jxr[=PFX]
+                          Use system libjxr [installed at prefix PFX]],
+    JXR_DIR=$withval)
+
+_SAVE_CFLAGS=$CFLAGS
+_SAVE_LDFLAGS=$LDFLAGS
+_SAVE_LIBS=$LIBS
+if test -n "${JXR_DIR}" -a "${JXR_DIR}" != "yes"; then
+    CFLAGS="-I${JXR_DIR}/include $CFLAGS"
+    LDFLAGS="-L${JXR_DIR}/lib $LDFLAGS"
+fi
+if test -z "$JXR_DIR" -o "$JXR_DIR" = "no"; then
+    MOZ_NATIVE_JXR=
+else
+    AC_CHECK_LIB(jxr, PKImageDecode_Create_WMP,
+        [MOZ_NATIVE_JXR=1 MOZ_JXR_LIBS="-ljxr"],
+        [MOZ_NATIVE_JXR= MOZ_JXR_CFLAGS= MOZ_JXR_LIBS=])
+fi
+CFLAGS=$_SAVE_CFLAGS
+LDFLAGS=$_SAVE_LDFLAGS
+LIBS=$_SAVE_LIBS
+
+if test "${JXR_DIR}" -a -d "${JXR_DIR}" -a "$MOZ_NATIVE_JXR" = 1; then
+    MOZ_JXR_CFLAGS="-I${JXR_DIR}/include"
+    MOZ_JXR_LIBS="-L${JXR_DIR}/lib ${MOZ_JXR_LIBS}"
+fi
+
+AC_SUBST(MOZ_NATIVE_JXR)
+
+dnl ========================================================
 dnl = Enable Raw Codecs
 dnl ========================================================
 MOZ_ARG_ENABLE_BOOL(raw,

@@ -50,9 +50,11 @@ Image::GetDecoderType(const char *aMimeType)
   else if (!strcmp(aMimeType, IMAGE_JPG))
     rv = eDecoderType_jpeg;
 
+#ifdef MOZ_JXR
   // JPEG-XR
   else if (!strcmp(aMimeType, IMAGE_JPEG_XR))
     rv = eDecoderType_jpeg_xr;
+#endif
 
   // WEBP
   else if (!strcmp(aMimeType, IMAGE_WEBP))

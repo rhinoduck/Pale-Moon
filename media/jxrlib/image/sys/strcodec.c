@@ -278,7 +278,7 @@ static ERR CloseWS_File(struct WMPStream** ppWS)
     struct WMPStream* pWS = *ppWS;
 
     fclose(pWS->state.file.pFile);
-    JXR_Call(WMPFree((void**)ppWS));
+    Call(WMPFree((void**)ppWS));
 
 Cleanup:
     return err;
@@ -303,7 +303,7 @@ static ERR WriteWS_File(struct WMPStream* pWS, const void* pv, size_t cb)
 
     if(0 != cb)
     {
-        JXR_FailIf(1 != fwrite(pv, cb, 1, pWS->state.file.pFile), WMP_errFileIO);
+        FailIf(1 != fwrite(pv, cb, 1, pWS->state.file.pFile), WMP_errFileIO);
     }
 
 Cleanup:
@@ -325,7 +325,7 @@ static ERR SetPosWS_File(struct WMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(0 != fseek(pWS->state.file.pFile, (long)offPos, SEEK_SET), WMP_errFileIO);
+    FailIf(0 != fseek(pWS->state.file.pFile, (long)offPos, SEEK_SET), WMP_errFileIO);
 
 Cleanup:
     return err;
@@ -336,7 +336,7 @@ static ERR GetPosWS_File(struct WMPStream* pWS, size_t* poffPos)
     ERR err = WMP_errSuccess;
     long lOff = 0;
 
-    JXR_FailIf(-1 == (lOff = ftell(pWS->state.file.pFile)), WMP_errFileIO);
+    FailIf(-1 == (lOff = ftell(pWS->state.file.pFile)), WMP_errFileIO);
     *poffPos = (size_t)lOff;
 
 Cleanup:
@@ -348,7 +348,7 @@ ERR CreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* s
     ERR err = WMP_errSuccess;
     struct WMPStream* pWS = NULL;
 
-    JXR_Call(WMPAlloc((void** )ppWS, sizeof(**ppWS)));
+    Call(WMPAlloc((void** )ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
 
     pWS->Close = CloseWS_File;
@@ -363,10 +363,10 @@ ERR CreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* s
     pWS->GetPos = GetPosWS_File;
 
 #ifdef WIN32
-    JXR_FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
+    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
 #else
     pWS->state.file.pFile = fopen(szFilename, szMode);
-    JXR_FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
+    FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
 #endif
 
 Cleanup:    
@@ -379,7 +379,7 @@ static ERR CloseWS_Memory(struct WMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(WMPFree((void**)ppWS));
+    Call(WMPFree((void**)ppWS));
     
 Cleanup:    
     return err;
@@ -394,8 +394,8 @@ static ERR ReadWS_Memory(struct WMPStream* pWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(pWS->state.buf.cbCur >= pWS->state.buf.cbBuf, WMP_errBufferOverflow); // Already beyond end of buffer
-    JXR_FailIf(pWS->state.buf.cbCur + cb > pWS->state.buf.cbBuf, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbCur >= pWS->state.buf.cbBuf, WMP_errBufferOverflow); // Already beyond end of buffer
+    FailIf(pWS->state.buf.cbCur + cb > pWS->state.buf.cbBuf, WMP_errBufferOverflow);
 
     memcpy(pv, pWS->state.buf.pbBuf + pWS->state.buf.cbCur, cb);
     pWS->state.buf.cbCur += cb;
@@ -409,7 +409,7 @@ static ERR ReadWS_Memory1(struct WMPStream *pWS, void *pv, size_t cbToRead, size
     ERR err = WMP_errSuccess;
 
     *pcbRead = 0;
-    JXR_FailIf(pWS->state.buf.cbCur >= pWS->state.buf.cbBuf, WMP_errBufferOverflow); // Already beyond end of buffer
+    FailIf(pWS->state.buf.cbCur >= pWS->state.buf.cbBuf, WMP_errBufferOverflow); // Already beyond end of buffer
 
     if (pWS->state.buf.cbBuf < pWS->state.buf.cbCur + cbToRead)
     {
@@ -429,8 +429,8 @@ static ERR WriteWS_Memory(struct WMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
-    JXR_FailIf(pWS->state.buf.cbBuf < pWS->state.buf.cbCur + cb, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbBuf < pWS->state.buf.cbCur + cb, WMP_errBufferOverflow);
 
     memcpy(pWS->state.buf.pbBuf + pWS->state.buf.cbCur, pv, cb);
     pWS->state.buf.cbCur += cb;
@@ -445,7 +445,7 @@ static ERR SetPosWS_Memory(struct WMPStream* pWS, size_t offPos)
 
     //While the following condition is possibly useful, failure occurs
     //at the end of a file since packets beyond the end may be accessed
-    //JXR_FailIf(pWS->state.buf.cbBuf < offPos, WMP_errBufferOverflow);
+    //FailIf(pWS->state.buf.cbBuf < offPos, WMP_errBufferOverflow);
     pWS->state.buf.cbCur = offPos;
 
 //Cleanup:
@@ -464,7 +464,7 @@ ERR CreateWS_Memory(struct WMPStream** ppWS, void* pv, size_t cb)
     ERR err = WMP_errSuccess;
     struct WMPStream* pWS = NULL;
 
-    JXR_Call(WMPAlloc((void** )ppWS, sizeof(**ppWS)));
+    Call(WMPAlloc((void** )ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
 
     pWS->state.buf.pbBuf = pv;
@@ -502,11 +502,11 @@ static ERR CloseWS_List(struct WMPStream** ppWS)
         while (pBuf) {
             void *pNext = *(void **)pBuf;
 //printf ("delete buffer    %x\n", pBuf);
-            JXR_Call(WMPFree(&pBuf));
+            Call(WMPFree(&pBuf));
             pBuf = pNext;
         }
 
-        JXR_Call(WMPFree((void **)ppWS));
+        Call(WMPFree((void **)ppWS));
     }
     
 Cleanup:    
@@ -521,7 +521,7 @@ static ERR ReadWS_List(struct WMPStream* pWS, void* pv, size_t cb)
         return WMP_errOutOfBounds;
 
 #if 0 // This kind of overflow is very unlikely
-    JXR_FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
 #endif
 
     if (pWS->state.buf.cbBuf < pWS->state.buf.cbDiscarded + pWS->state.buf.cbCur + LIST_PACKETLENGTH * (pWS->state.buf.cbBufCount - 1) + cb)
@@ -572,7 +572,7 @@ static ERR ReadWS_List1(struct WMPStream* pWS, void* pv, size_t cb, size_t *pcbR
     currPos = pWS->state.buf.cbDiscarded + pWS->state.buf.cbCur + LIST_PACKETLENGTH * (pWS->state.buf.cbBufCount - 1);
 
 #if 0 // This kind of overflow is very unlikely
-    JXR_FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
 #endif
 
     if (pWS->state.buf.cbBuf < currPos + cb)
@@ -613,8 +613,8 @@ static ERR WriteWS_List(struct WMPStream* pWS, const void* pv, size_t cb)
     ERR err = WMP_errSuccess;
 
 #if 0 // This kind of overflow is very unlikely.
-    JXR_FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
-    JXR_FailIf(pWS->state.buf.cbBuf < pWS->state.buf.cbCur + cb, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbCur + cb < pWS->state.buf.cbCur, WMP_errBufferOverflow);
+    FailIf(pWS->state.buf.cbBuf < pWS->state.buf.cbCur + cb, WMP_errBufferOverflow);
 #endif
 
     while (cb)
@@ -632,7 +632,7 @@ static ERR WriteWS_List(struct WMPStream* pWS, const void* pv, size_t cb)
             else
                 pPtrLoc = (void **)(pWS->state.buf.pbBuf - sizeof(void *));
 
-            JXR_Call(WMPAlloc((void **)&pBuf, LIST_PACKETLENGTH + sizeof(void *)));
+            Call(WMPAlloc((void **)&pBuf, LIST_PACKETLENGTH + sizeof(void *)));
             pPtrLoc[0] = (void *)pBuf;
             pWS->state.buf.pbBuf = pBuf + sizeof(void *);
             memset(pBuf, 0, sizeof(void *));
@@ -767,7 +767,7 @@ ERR CreateWS_List(struct WMPStream** ppWS)
     ERR err = WMP_errSuccess;
     struct WMPStream* pWS = NULL;
 
-    JXR_Call(WMPAlloc((void** )ppWS, sizeof(**ppWS) + sizeof(void *)));
+    Call(WMPAlloc((void** )ppWS, sizeof(**ppWS) + sizeof(void *)));
 
     pWS = *ppWS;
     pWS->state.buf.pbBuf = NULL;
@@ -821,7 +821,7 @@ ERR getBit32_SB(SimpleBitIO *pSB, U32 cBits, U32 *prc)
 
         cBits -= pSB->cBitLeft;
 
-        JXR_Call(pSB->pWS->Read(pSB->pWS, &pSB->bAccumulator, 1));
+        Call(pSB->pWS->Read(pSB->pWS, &pSB->bAccumulator, 1));
         pSB->cbRead++;
         pSB->cBitLeft = 8;
     }
@@ -1353,7 +1353,7 @@ ERR attachISRead(BitIOInfo* pIO, struct WMPStream* pWS, CWMImageStrCodec* pSC)
     PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
 
     toRead = min(PACKETLENGTH * 2, upperLimit - pos);
-    JXR_Call(pWS->Read1(pWS, pStart, toRead, &cbRead));
+    Call(pWS->Read1(pWS, pStart, toRead, &cbRead));
 
     if (cbRead < toRead)
     {
@@ -1413,8 +1413,8 @@ ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 
         PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
 
-        JXR_Call(pWS->SetPos(pWS, pIO->offRef));
-        JXR_Call(pWS->Read1(pWS, pIO->pbStart, toRead, &cbRead));
+        Call(pWS->SetPos(pWS, pIO->offRef));
+        Call(pWS->Read1(pWS, pIO->pbStart, toRead, &cbRead));
 
         if (cbRead < toRead)
         {
@@ -1496,7 +1496,7 @@ ERR writeIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
         PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
         err = pIO->pWS->Write(pIO->pWS, pIO->pbStart, PACKETLENGTH);
         PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
-        JXR_Call(err);
+        Call(err);
 
         // reposition pbStart pointer
         pIO->pbStart = MASKPTR(pIO->pbStart + PACKETLENGTH, pIO->iMask);
@@ -1513,12 +1513,12 @@ ERR detachISWrite(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 
     // we can ONLY detach IStream at byte boundary
     assert(0 == (pIO->cBitsUsed % 8));
-    JXR_Call(writeIS_L1(pSC, pIO));
+    Call(writeIS_L1(pSC, pIO));
 
     PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     err = pIO->pWS->Write(pIO->pWS, pIO->pbStart, pIO->pbCurrent + pIO->cBitsUsed / 8 - pIO->pbStart);
     PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
-    JXR_Call(err);
+    Call(err);
 
     pIO->pWS = NULL;
 Cleanup:
@@ -1560,7 +1560,7 @@ void OutputIndivPerfTimer(struct PERFTIMERSTATE *pPerfTimer,
 }
 
 
-void OutputPerfTimerJXR_Report(CWMImageStrCodec *pState)
+void OutputPerfTimerReport(CWMImageStrCodec *pState)
 {
     float               fltMegaPixels;
 

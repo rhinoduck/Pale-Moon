@@ -233,7 +233,7 @@ typedef enum {ERROR_FAIL = -1, SUCCESS_DONE, PRE_READ_HDR, PRE_SETUP, PRE_DECODE
 //================================================================
 typedef long ERR;
 
-#define JXR_Failed(err) ((err)<0)
+#define Failed(err) ((err)<0)
 
 #ifndef CRLF
 #define CRLF "\r\n"
@@ -241,34 +241,33 @@ typedef long ERR;
 
 #define CT_ASSERT(exp, uniq) typedef char __CT_ASSERT__##uniq[(exp) ? 1 : -1] // Caller must provide a unique tag, or this fails to compile under GCC
 
-// TODO: Testing! Remove '1'!
-#if defined(_DEBUG) || defined(DBG) || 1
-#define JXR_Report(err, szExp, szFile, nLine) \
+#if defined(_DEBUG) || defined(DBG)
+#define Report(err, szExp, szFile, nLine) \
     fprintf(stderr, "FAILED: %ld=%s" CRLF, (err), (szExp)); \
     fprintf(stderr, "        %s:%ld" CRLF, (szFile), (nLine));  \
 
 #else
-#define JXR_Report(err, szExp, szFile, lLine) err = err
+#define Report(err, szExp, szFile, lLine) err = err
 #endif
 
-#define JXR_Call(exp) \
-    if (JXR_Failed(err = (exp))) \
+#define Call(exp) \
+    if (Failed(err = (exp))) \
     { \
-        JXR_Report(err, #exp, __FILE__, (long)__LINE__); \
+        Report(err, #exp, __FILE__, (long)__LINE__); \
         goto Cleanup; \
     } \
     else err = err
 
-#define JXR_CallIgnoreError(errTmp, exp) \
-    if (JXR_Failed(errTmp = (exp))) \
+#define CallIgnoreError(errTmp, exp) \
+    if (Failed(errTmp = (exp))) \
     { \
-        JXR_Report(errTmp, #exp, __FILE__, (long)__LINE__); \
+        Report(errTmp, #exp, __FILE__, (long)__LINE__); \
     } \
     else errTmp = errTmp
 
 
-#define JXR_Test(exp, err) JXR_Call((exp) ? WMP_errSuccess : (err))
-#define JXR_FailIf(exp, err) JXR_Call((exp) ? (err) : WMP_errSuccess)
+#define Test(exp, err) Call((exp) ? WMP_errSuccess : (err))
+#define FailIf(exp, err) Call((exp) ? (err) : WMP_errSuccess)
 
 //================================================================
 // WMPStream interface

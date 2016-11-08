@@ -63,7 +63,7 @@
 #define PERFTIMER_COPYSTARTTIME(fPerf, pDst, pSrc) \
     if (fPerf) {Bool b = b = PerfTimerCopyStartTime((pDst), (pSrc)); assert(b);};
 #define PERFTIMER_REPORT(fPerf, pCodec) \
-    if (fPerf) {OutputPerfTimerJXR_Report(pCodec);};
+    if (fPerf) {OutputPerfTimerReport(pCodec);};
 #endif // DISABLE_PERF_MEASUREMENT
 
 //***************************************************************************

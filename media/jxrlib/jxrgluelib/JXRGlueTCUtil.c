@@ -48,13 +48,13 @@ ERR PKImageEncode_Transcode_WMP(
     struct WMPStream* pWSEnc= pIE->pStream;
 
     // pass through metadata
-    JXR_Call(pID->GetPixelFormat(pID, &pixGUID));
-    JXR_Call(pIE->SetPixelFormat(pIE, pixGUID));
+    Call(pID->GetPixelFormat(pID, &pixGUID));
+    Call(pIE->SetPixelFormat(pIE, pixGUID));
 
-    JXR_Call(pIE->SetSize(pIE, (I32)pParam->cWidth, (I32)pParam->cHeight));
+    Call(pIE->SetSize(pIE, (I32)pParam->cWidth, (I32)pParam->cHeight));
 
-    JXR_Call(pID->GetResolution(pID, &fResX, &fResY));
-    JXR_Call(pIE->SetResolution(pIE, fResX, fResY));
+    Call(pID->GetResolution(pID, &fResX, &fResY));
+    Call(pIE->SetResolution(pIE, fResX, fResY));
 
     PI.pGUIDPixFmt = &pIE->guidPixFormat;
     PixelFormatLookup(&PI, LOOKUP_FORWARD);
@@ -65,11 +65,11 @@ ERR PKImageEncode_Transcode_WMP(
     // NOTE: Decoder's bHasAlpha parameter really means, "has PLANAR alpha"
     PI.pGUIDPixFmt = &pixGUID;
     PixelFormatLookup(&PI, LOOKUP_FORWARD);
-    JXR_FailIf(0 == (PI.grBit & PK_pixfmtHasAlpha) && pParam->uAlphaMode != 0,
+    FailIf(0 == (PI.grBit & PK_pixfmtHasAlpha) && pParam->uAlphaMode != 0,
         WMP_errAlphaModeCannotBeTranscoded); // Destination is planar/interleaved, src has no alpha
-    JXR_FailIf(!!(PI.grBit & PK_pixfmtHasAlpha) && 2 == pParam->uAlphaMode &&
+    FailIf(!!(PI.grBit & PK_pixfmtHasAlpha) && 2 == pParam->uAlphaMode &&
         FALSE == pID->WMP.bHasAlpha, WMP_errAlphaModeCannotBeTranscoded);  // Destination is planar, src is interleaved
-    JXR_FailIf(!!(PI.grBit & PK_pixfmtHasAlpha) && 3 == pParam->uAlphaMode &&
+    FailIf(!!(PI.grBit & PK_pixfmtHasAlpha) && 3 == pParam->uAlphaMode &&
         pID->WMP.bHasAlpha, WMP_errAlphaModeCannotBeTranscoded);  // Destination is interleaved, src is planar
     assert(//pParam->uAlphaMode >= 0 &&
         pParam->uAlphaMode <= 3); // All the above statements make this assumption
@@ -77,22 +77,22 @@ ERR PKImageEncode_Transcode_WMP(
     fPlanarAlpha = pIE->WMP.bHasAlpha && (2 == pParam->uAlphaMode);
 
     // write matadata
-    JXR_Call(WriteContainerPre(pIE));
+    Call(WriteContainerPre(pIE));
 
     // Copy transcoding params for alpha (codec changes the struct)
     if (fPlanarAlpha)
         tcParamAlpha = *pParam;
 
     // write compressed bitstream
-    JXR_Call(pID->GetRawStream(pID, &pWSDec));
+    Call(pID->GetRawStream(pID, &pWSDec));
 
     /////////////////////
     pParam->uImageOffset = pID->WMP.wmiDEMisc.uImageOffset;
     pParam->uImageByteCount = pID->WMP.wmiDEMisc.uImageByteCount;
     ////////////
 
-    JXR_FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, pParam), WMP_errFail);
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+    FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, pParam), WMP_errFail);
+    Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbImage = (Long)offPos - pIE->WMP.nOffImage;
 
     if (fPlanarAlpha)
@@ -106,15 +106,15 @@ ERR PKImageEncode_Transcode_WMP(
 
         // Cue the stream to alpha block
         assert(pID->WMP.wmiDEMisc.uAlphaOffset > 0);
-        JXR_Call(pWSDec->SetPos(pWSDec, pID->WMP.wmiDEMisc.uAlphaOffset));
+        Call(pWSDec->SetPos(pWSDec, pID->WMP.wmiDEMisc.uAlphaOffset));
 
-        JXR_FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, &tcParamAlpha), WMP_errFail);
-        JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+        FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, &tcParamAlpha), WMP_errFail);
+        Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
         pIE->WMP.nCbAlpha = (Long)offPos - pIE->WMP.nOffAlpha;
     }
 
     // fixup matadata
-    JXR_Call(WriteContainerPost(pIE));
+    Call(WriteContainerPost(pIE));
 
 Cleanup:
     return err;

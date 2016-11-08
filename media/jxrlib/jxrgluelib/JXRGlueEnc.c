@@ -150,14 +150,14 @@ ERR CopyDescMetadata(DPKPROPVARIANT *pvarDst,
         case DPKVT_LPSTR:
             pvarDst->vt = DPKVT_LPSTR;
             uiSize = strlen(varSrc.VT.pszVal) + 1;
-            JXR_Call(PKAlloc((void **) &pvarDst->VT.pszVal, uiSize));
+            Call(PKAlloc((void **) &pvarDst->VT.pszVal, uiSize));
             memcpy(pvarDst->VT.pszVal, varSrc.VT.pszVal, uiSize);
             break;
             
         case DPKVT_LPWSTR:
             pvarDst->vt = DPKVT_LPWSTR;
             uiSize = sizeof(U16) * (wcslen((wchar_t *) varSrc.VT.pwszVal) + 1); // +1 for NULL term
-            JXR_Call(PKAlloc((void **) &pvarDst->VT.pszVal, uiSize));
+            Call(PKAlloc((void **) &pvarDst->VT.pszVal, uiSize));
             memcpy(pvarDst->VT.pwszVal, varSrc.VT.pwszVal, uiSize);
             break;
 
@@ -171,7 +171,7 @@ ERR CopyDescMetadata(DPKPROPVARIANT *pvarDst,
 
         default:
             assert(FALSE); // This case is not handled
-            JXR_FailIf(TRUE, WMP_errNotYetImplemented);
+            FailIf(TRUE, WMP_errNotYetImplemented);
 
             // *** FALL THROUGH ***
 
@@ -214,33 +214,33 @@ ERR WriteDescMetadata(PKImageEncode *pIE,
             CalcMetadataSizeLPSTR(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
             pwmpDE->uCount = uiCount;
             pwmpDE->uValueOrOffset = pDEMisc->uDescMetadataOffset + *puiCurrDescMetadataOffset;
-            JXR_Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pszVal, &uiDataWrittenToOffset));
+            Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pszVal, &uiDataWrittenToOffset));
             break;
 
         case DPKVT_LPWSTR:
             CalcMetadataSizeLPWSTR(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
             pwmpDE->uCount = uiCount;
             pwmpDE->uValueOrOffset = pDEMisc->uDescMetadataOffset + *puiCurrDescMetadataOffset;
-            JXR_Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pwszVal, &uiDataWrittenToOffset));
+            Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pwszVal, &uiDataWrittenToOffset));
             break;
 
         case DPKVT_UI2:
             CalcMetadataSizeUI2(var, &uiTemp, &uiMetadataOffsetSize);
             pwmpDE->uCount = 1;
             pwmpDE->uValueOrOffset = var.VT.uiVal;
-            JXR_Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
+            Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
             break;
 
         case DPKVT_UI4:
             CalcMetadataSizeUI4(var, &uiTemp, &uiMetadataOffsetSize);
             pwmpDE->uCount = 1;
             pwmpDE->uValueOrOffset = var.VT.ulVal;
-            JXR_Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
+            Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
             break;
 
         default:
             assert(FALSE); // This case is not handled
-            JXR_FailIf(TRUE, WMP_errNotYetImplemented);
+            FailIf(TRUE, WMP_errNotYetImplemented);
             break;
     }
 
@@ -321,14 +321,14 @@ ERR WriteContainerPre(
     assert(SizeofIFDEntry * sizeof(wmpDEs) / sizeof(wmpDEs[0]) + sizeof(U32) > 0x20);
 
     //================
-    JXR_Call(pWS->GetPos(pWS, &offPos));
-    JXR_FailIf(0 != offPos, WMP_errUnsupportedFormat);
+    Call(pWS->GetPos(pWS, &offPos));
+    FailIf(0 != offPos, WMP_errUnsupportedFormat);
 
     //================
     // Header (8 bytes)
-    JXR_Call(pWS->Write(pWS, IIMM, sizeof(IIMM))); offPos += 2;
-    JXR_Call(PutUShort(pWS, offPos, 0x01bc)); offPos += 2;
-    JXR_Call(PutULong(pWS, offPos, (U32)OFFSET_OF_PFD)); offPos += 4;
+    Call(pWS->Write(pWS, IIMM, sizeof(IIMM))); offPos += 2;
+    Call(PutUShort(pWS, offPos, 0x01bc)); offPos += 2;
+    Call(PutULong(pWS, offPos, (U32)OFFSET_OF_PFD)); offPos += 4;
 
     //================
     // Write overflow area
@@ -336,27 +336,27 @@ ERR WriteContainerPre(
     PI.pGUIDPixFmt = &pIE->guidPixFormat;
     PixelFormatLookup(&PI, LOOKUP_FORWARD);
 
-    //JXR_Call(pWS->Write(pWS, PI.pGUIDPixFmt, sizeof(*PI.pGUIDPixFmt))); offPos += 16;
+    //Call(pWS->Write(pWS, PI.pGUIDPixFmt, sizeof(*PI.pGUIDPixFmt))); offPos += 16;
     /** following code is endian-agnostic **/
     {
         unsigned char *pGuid = (unsigned char *) &pIE->guidPixFormat;
-        JXR_Call(PutULong(pWS, offPos, ((U32 *)pGuid)[0]));
-        JXR_Call(PutUShort(pWS, offPos + 4, ((U16 *)(pGuid + 4))[0]));
-        JXR_Call(PutUShort(pWS, offPos + 6, ((U16 *)(pGuid + 6))[0]));
-        JXR_Call(pWS->Write(pWS, pGuid + 8, 8));
+        Call(PutULong(pWS, offPos, ((U32 *)pGuid)[0]));
+        Call(PutUShort(pWS, offPos + 4, ((U16 *)(pGuid + 4))[0]));
+        Call(PutUShort(pWS, offPos + 6, ((U16 *)(pGuid + 6))[0]));
+        Call(pWS->Write(pWS, pGuid + 8, 8));
         offPos += 16;
     }
 
     //================
     // Tally up space required for descriptive metadata 
-    JXR_Call(CalcMetadataOffsetSize(pIE, &cInactiveMetadata, &cbMetadataOffsetSize));
+    Call(CalcMetadataOffsetSize(pIE, &cInactiveMetadata, &cbMetadataOffsetSize));
     cWmpDEs -= cInactiveMetadata;
 
     //================
     // PFD
     assert (offPos <= OFFSET_OF_PFD); // otherwise stuff is overwritten
     if (offPos < OFFSET_OF_PFD)
-        JXR_Call(pWS->Write(pWS, Zero, OFFSET_OF_PFD - offPos));
+        Call(pWS->Write(pWS, Zero, OFFSET_OF_PFD - offPos));
     offPos = (size_t)OFFSET_OF_PFD;
 
     if (!pIE->WMP.bHasAlpha || pIE->WMP.wmiSCP.uAlphaMode != 2) //no planar alpha
@@ -427,78 +427,78 @@ ERR WriteContainerPre(
         pDEMisc->uImageOffset += pIE->cbGPSInfoMetadataByteCount;
     }
 
-    JXR_Call(PutUShort(pWS, offPos, cWmpDEs)); offPos += 2;
-    JXR_Call(pWS->Write(pWS, Zero, SizeofIFDEntry * cWmpDEs + sizeof(U32)));
+    Call(PutUShort(pWS, offPos, cWmpDEs)); offPos += 2;
+    Call(pWS->Write(pWS, Zero, SizeofIFDEntry * cWmpDEs + sizeof(U32)));
 
     //================
     wmpDE = wmpDEs[i++];
     assert(WMP_tagDocumentName == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDocumentName, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDocumentName, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageDescription == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarImageDescription, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarImageDescription, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCameraMake == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraMake, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraMake, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCameraModel == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraModel, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraModel, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPageName == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageName, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageName, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPageNumber == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageNumber, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageNumber, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagSoftware == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarSoftware, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarSoftware, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagDateTime == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDateTime, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDateTime, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagArtist == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarArtist, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarArtist, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagHostComputer == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarHostComputer, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarHostComputer, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagRatingStars == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingStars, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingStars, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagRatingValue == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingValue, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingValue, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCopyright == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCopyright, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCopyright, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCaption == wmpDE.uTag);
-    JXR_Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCaption, &wmpDE,
+    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCaption, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     // XMP Metadata
@@ -509,7 +509,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbXMPMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uXMPMetadataOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbXMPMetadata, &uiTemp));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbXMPMetadata, &uiTemp));
     }
 
     // IPTCNAA Metadata
@@ -520,7 +520,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbIPTCNAAMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uIPTCNAAMetadataOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbIPTCNAAMetadata, &uiTemp));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbIPTCNAAMetadata, &uiTemp));
     }
 
     // Photoshop Metadata
@@ -531,7 +531,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbPhotoshopMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uPhotoshopMetadataOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbPhotoshopMetadata, &uiTemp));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbPhotoshopMetadata, &uiTemp));
     }
 
     // EXIF Metadata
@@ -542,19 +542,19 @@ ERR WriteContainerPre(
         U32 uiTemp;
         if ((pDEMisc->uEXIFMetadataOffset & 1) != 0)
         {
-            JXR_Call(pWS->SetPos(pWS, pDEMisc->uEXIFMetadataOffset));
-            JXR_Call(pWS->Write(pWS, Zero, 1));
+            Call(pWS->SetPos(pWS, pDEMisc->uEXIFMetadataOffset));
+            Call(pWS->Write(pWS, Zero, 1));
         }
         pDEMisc->uEXIFMetadataOffset += (pDEMisc->uEXIFMetadataOffset & 1);
         wmpDE.uValueOrOffset = pDEMisc->uEXIFMetadataOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
-        JXR_Call(PKAlloc((void **) &pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
+        Call(PKAlloc((void **) &pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
         uiTemp = pDEMisc->uEXIFMetadataOffset;
-        JXR_Call(BufferCopyIFD(pIE->pbEXIFMetadata, pIE->cbEXIFMetadataByteCount, 0, WMP_INTEL_ENDIAN,
+        Call(BufferCopyIFD(pIE->pbEXIFMetadata, pIE->cbEXIFMetadataByteCount, 0, WMP_INTEL_ENDIAN,
             pbEXIFMetadata - uiTemp, uiTemp + pIE->cbEXIFMetadataByteCount, &uiTemp));
-        JXR_Call(pWS->SetPos(pWS, pDEMisc->uEXIFMetadataOffset));
-        JXR_Call(pWS->Write(pWS, pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
+        Call(pWS->SetPos(pWS, pDEMisc->uEXIFMetadataOffset));
+        Call(pWS->Write(pWS, pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
     }
 
     // ICC Profile
@@ -565,7 +565,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbColorContext;
         wmpDE.uValueOrOffset = pDEMisc->uColorProfileOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbColorContext, &uiTemp));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbColorContext, &uiTemp));
     }
 
     // GPSInfo Metadata
@@ -576,62 +576,62 @@ ERR WriteContainerPre(
         U32 uiTemp;
         if ((pDEMisc->uGPSInfoMetadataOffset & 1) != 0)
         {
-            JXR_Call(pWS->SetPos(pWS, pDEMisc->uGPSInfoMetadataOffset));
-            JXR_Call(pWS->Write(pWS, Zero, 1));
+            Call(pWS->SetPos(pWS, pDEMisc->uGPSInfoMetadataOffset));
+            Call(pWS->Write(pWS, Zero, 1));
         }
         pDEMisc->uGPSInfoMetadataOffset += (pDEMisc->uGPSInfoMetadataOffset & 1);
         wmpDE.uValueOrOffset = pDEMisc->uGPSInfoMetadataOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
-        JXR_Call(PKAlloc((void **) &pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
+        Call(PKAlloc((void **) &pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
         uiTemp = pDEMisc->uGPSInfoMetadataOffset;
-        JXR_Call(BufferCopyIFD(pIE->pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount, 0, WMP_INTEL_ENDIAN,
+        Call(BufferCopyIFD(pIE->pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount, 0, WMP_INTEL_ENDIAN,
             pbGPSInfoMetadata - uiTemp, uiTemp + pIE->cbGPSInfoMetadataByteCount, &uiTemp));
-        JXR_Call(pWS->SetPos(pWS, pDEMisc->uGPSInfoMetadataOffset));
-        JXR_Call(pWS->Write(pWS, pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
+        Call(pWS->SetPos(pWS, pDEMisc->uGPSInfoMetadataOffset));
+        Call(pWS->Write(pWS, pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
     }
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPixelFormat == wmpDE.uTag);
     wmpDE.uValueOrOffset = pDEMisc->uOffPixelFormat;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagTransformation == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->WMP.oOrientation;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageWidth == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->uWidth;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageHeight == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->uHeight;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
     
     wmpDE = wmpDEs[i++];
     assert(WMP_tagWidthResolution == wmpDE.uTag);
     *((float *) &wmpDE.uValueOrOffset) = pIE->fResX;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagHeightResolution == wmpDE.uTag);
     *((float *) &wmpDE.uValueOrOffset) = pIE->fResY;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
    
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageOffset == wmpDE.uTag);
     wmpDE.uValueOrOffset = pDEMisc->uImageOffset;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     // fix up in WriteContainerPost()
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageByteCount == wmpDE.uTag);
     pDEMisc->uOffImageByteCount = (U32)offPos;
     wmpDE.uValueOrOffset = 0;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {
@@ -640,18 +640,18 @@ ERR WriteContainerPre(
         assert(WMP_tagAlphaOffset == wmpDE.uTag);
         pDEMisc->uOffAlphaOffset = (U32)offPos;
         wmpDE.uValueOrOffset = 0;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
 
         // fix up in WriteContainerPost()
         wmpDE = wmpDEs[i++];
         assert(WMP_tagAlphaByteCount == wmpDE.uTag);
         pDEMisc->uOffAlphaByteCount = (U32)offPos;
         wmpDE.uValueOrOffset = 0;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
     }
 
     //================
-    JXR_Call(PutULong(pWS, offPos, 0)); offPos += 4;
+    Call(PutULong(pWS, offPos, 0)); offPos += 4;
 
     assert(0 == (offPos & 1));
     if (pDEMisc->uColorProfileOffset > 0 || pDEMisc->uDescMetadataOffset > 0 ||
@@ -668,7 +668,7 @@ ERR WriteContainerPre(
                pDEMisc->uGPSInfoMetadataOffset == offPos);
 
         // OK, now skip to image offset
-        JXR_Call(pWS->SetPos(pWS, pDEMisc->uImageOffset));
+        Call(pWS->SetPos(pWS, pDEMisc->uImageOffset));
         offPos = pDEMisc->uImageOffset;
     }
     assert(pDEMisc->uImageOffset == offPos);
@@ -698,18 +698,18 @@ ERR WriteContainerPost(
 
     deImageByteCount.uValueOrOffset = pIE->WMP.nCbImage;
     offPos = pDEMisc->uOffImageByteCount;
-    JXR_Call(WriteWmpDE(pWS, &offPos, &deImageByteCount, NULL, NULL));
+    Call(WriteWmpDE(pWS, &offPos, &deImageByteCount, NULL, NULL));
 
     //Alpha
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {                
         deAlphaOffset.uValueOrOffset = pIE->WMP.nOffAlpha;
         offPos = pDEMisc->uOffAlphaOffset;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &deAlphaOffset, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &deAlphaOffset, NULL, NULL));
 
         deAlphaByteCount.uValueOrOffset = pIE->WMP.nCbAlpha;
         offPos = pDEMisc->uOffAlphaByteCount;
-        JXR_Call(WriteWmpDE(pWS, &offPos, &deAlphaByteCount, NULL, NULL));
+        Call(WriteWmpDE(pWS, &offPos, &deAlphaByteCount, NULL, NULL));
     }
 
 Cleanup:
@@ -726,7 +726,7 @@ ERR PKImageEncode_Initialize_WMP(
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(sizeof(pIE->WMP.wmiSCP) != cbParam, WMP_errInvalidArgument);
+    FailIf(sizeof(pIE->WMP.wmiSCP) != cbParam, WMP_errInvalidArgument);
 
     pIE->WMP.wmiSCP = *(CWMIStrCodecParam*)pvParam;
     pIE->WMP.wmiSCP_Alpha = *(CWMIStrCodecParam*)pvParam;
@@ -792,7 +792,7 @@ ERR PKImageEncode_EncodeContent_Init(
     pIE->idxCurrentLine = 0;
     
     pIE->WMP.wmiSCP.fMeasurePerf = TRUE;
-    JXR_FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI, &pIE->WMP.wmiSCP, &pIE->WMP.ctxSC), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI, &pIE->WMP.wmiSCP, &pIE->WMP.ctxSC), WMP_errFail);
 
 Cleanup:
     return err;
@@ -816,7 +816,7 @@ ERR PKImageEncode_EncodeContent_Encode(
         wmiBI.pv = pbPixels + cbStride * i / (f420 ? 2 : 1);
         wmiBI.cLine = min(16, cLine - i);
         wmiBI.cbStride = cbStride;
-        JXR_FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC, &wmiBI), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC, &wmiBI), WMP_errFail);
     }
     pIE->idxCurrentLine += cLine;
 
@@ -828,7 +828,7 @@ ERR PKImageEncode_EncodeContent_Term(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC), WMP_errFail);
 
 Cleanup:
     return err;
@@ -844,14 +844,14 @@ ERR PKImageEncode_EncodeContent(
     ERR err = WMP_errSuccess;
     size_t offPos = 0;
 
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+    Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nOffImage = (Long)offPos;
 
-    JXR_Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
-    JXR_Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
-    JXR_Call(PKImageEncode_EncodeContent_Term(pIE));
+    Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeContent_Term(pIE));
 
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+    Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbImage = (Long)offPos - pIE->WMP.nOffImage;
 
 Cleanup:
@@ -918,7 +918,7 @@ ERR PKImageEncode_EncodeAlpha_Init(
 
     pIE->idxCurrentLine = 0;
     pIE->WMP.wmiSCP_Alpha.fMeasurePerf = TRUE;
-    JXR_FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI_Alpha, &pIE->WMP.wmiSCP_Alpha, &pIE->WMP.ctxSC_Alpha), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI_Alpha, &pIE->WMP.wmiSCP_Alpha, &pIE->WMP.ctxSC_Alpha), WMP_errFail);
 
 Cleanup:
     return err;
@@ -940,7 +940,7 @@ ERR PKImageEncode_EncodeAlpha_Encode(
         wmiBI.pv = pbPixels + cbStride * i;
         wmiBI.cLine = min(16, cLine - i);
         wmiBI.cbStride = cbStride;
-        JXR_FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC_Alpha, &wmiBI), WMP_errFail);
+        FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC_Alpha, &wmiBI), WMP_errFail);
     }
     pIE->idxCurrentLine += cLine;
 
@@ -952,7 +952,7 @@ ERR PKImageEncode_EncodeAlpha_Term(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC_Alpha), WMP_errFail);
+    FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC_Alpha), WMP_errFail);
 
 Cleanup:
     return err;
@@ -968,21 +968,21 @@ ERR PKImageEncode_EncodeAlpha(
     ERR err = WMP_errSuccess;
     size_t offPos = 0;
 
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+    Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     if ((offPos & 1) != 0)
     {
         // Make the mark even if it is odd by inserting a pad byte
         char zero = 0;
-        JXR_Call(pIE->pStream->Write(pIE->pStream, &zero, 1));
+        Call(pIE->pStream->Write(pIE->pStream, &zero, 1));
         offPos++;
     }
     pIE->WMP.nOffAlpha = (Long)offPos;
 
-    JXR_Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
-    JXR_Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
-    JXR_Call(PKImageEncode_EncodeAlpha_Term(pIE));
+    Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeAlpha_Term(pIE));
 
-    JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+    Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbAlpha = (Long)offPos - pIE->WMP.nOffAlpha;
 
 Cleanup:
@@ -1007,7 +1007,7 @@ static ERR SetMetadata(PKImageEncode *pIE, const U8 *pbMetadata, U32 cbMetadata,
     PKFree((void **) pbSet);
     *pcbSet = 0;
 
-    JXR_Call(PKAlloc((void **) pbSet, cbMetadata));
+    Call(PKAlloc((void **) pbSet, cbMetadata));
     memcpy(*pbSet, pbMetadata, cbMetadata);
     *pcbSet = cbMetadata;
 
@@ -1036,7 +1036,7 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode *pIE, const U8 *pbXMPMetadata
     size_t cbBuffer;
 
     // Fail if the caller called us after we've already written the header out
-    JXR_FailIf(pIE->fHeaderDone, WMP_errOutOfSequence);
+    FailIf(pIE->fHeaderDone, WMP_errOutOfSequence);
     
     // Free any previously set XMP metadata
     PKFree((void **) &pIE->pbXMPMetadata);
@@ -1047,7 +1047,7 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode *pIE, const U8 *pbXMPMetadata
     // there may already be a dc:format we will replace with HD Photo's
     // but anyway this block will be large enough guaranteed
     cbBuffer = cbXMPMetadata + 1 + sizeof("<dc:format>") - 1 + sizeof("</dc:format>") - 1 + sizeof(szHDPhotoFormat) - 1;
-    JXR_Call(PKAlloc((void **) &pbTemp, cbBuffer));
+    Call(PKAlloc((void **) &pbTemp, cbBuffer));
     memcpy(pbTemp, pbXMPMetadata, cbXMPMetadata); // Make a copy of the metadata
     pbTemp[cbXMPMetadata] = '\0';
     cbXMPMetadata = (U32)strlen(pbTemp);
@@ -1058,16 +1058,16 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode *pIE, const U8 *pbXMPMetadata
         const char* pszLessThan;
 
         pszFormatEnd = strstr(pszFormatBegin, "</dc:format>");
-        JXR_FailIf(pszFormatEnd == 0, WMP_errFail);
+        FailIf(pszFormatEnd == 0, WMP_errFail);
         pszLessThan = strchr(pszFormatBegin + sizeof("<dc:format>") - 1, '<');
-        JXR_FailIf(pszLessThan != pszFormatEnd, WMP_errFail);
+        FailIf(pszLessThan != pszFormatEnd, WMP_errFail);
         pszFormatEnd += sizeof("</dc:format>") - 1;
 
         // photoshop doesn't put a trailing null, so we don't either
         // hd and tiff don't put a trailing null, so we don't either
         cbTemp = cbXMPMetadata - (U32) ( pszFormatEnd - pszFormatBegin ) + sizeof(szHDPhotoFormat) - 1;
         assert(cbTemp <= cbBuffer);
-        JXR_FailIf(0 != STRCPY_SAFE(pszFormatBegin,
+        FailIf(0 != STRCPY_SAFE(pszFormatBegin,
             cbBuffer - (pszFormatBegin - pbTemp),
             szHDPhotoFormat),
             WMP_errBufferOverflow);
@@ -1132,24 +1132,24 @@ ERR PKImageEncode_SetDescriptiveMetadata_WMP(PKImageEncode *pIE, const DESCRIPTI
     if (pIE->fHeaderDone)
     {
         assert(FALSE); // Message to programmer
-        JXR_FailIf(TRUE, WMP_errOutOfSequence);
+        FailIf(TRUE, WMP_errOutOfSequence);
     }
 
     // Make a copy of the descriptive metadata
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarImageDescription, pSrcMeta->pvarImageDescription));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarCameraMake, pSrcMeta->pvarCameraMake));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarCameraModel, pSrcMeta->pvarCameraModel));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarSoftware, pSrcMeta->pvarSoftware));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarDateTime, pSrcMeta->pvarDateTime));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarArtist, pSrcMeta->pvarArtist));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarCopyright, pSrcMeta->pvarCopyright));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarRatingStars, pSrcMeta->pvarRatingStars));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarRatingValue, pSrcMeta->pvarRatingValue));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarCaption, pSrcMeta->pvarCaption));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarDocumentName, pSrcMeta->pvarDocumentName));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarPageName, pSrcMeta->pvarPageName));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarPageNumber, pSrcMeta->pvarPageNumber));
-    JXR_Call(CopyDescMetadata(&pDstMeta->pvarHostComputer, pSrcMeta->pvarHostComputer));
+    Call(CopyDescMetadata(&pDstMeta->pvarImageDescription, pSrcMeta->pvarImageDescription));
+    Call(CopyDescMetadata(&pDstMeta->pvarCameraMake, pSrcMeta->pvarCameraMake));
+    Call(CopyDescMetadata(&pDstMeta->pvarCameraModel, pSrcMeta->pvarCameraModel));
+    Call(CopyDescMetadata(&pDstMeta->pvarSoftware, pSrcMeta->pvarSoftware));
+    Call(CopyDescMetadata(&pDstMeta->pvarDateTime, pSrcMeta->pvarDateTime));
+    Call(CopyDescMetadata(&pDstMeta->pvarArtist, pSrcMeta->pvarArtist));
+    Call(CopyDescMetadata(&pDstMeta->pvarCopyright, pSrcMeta->pvarCopyright));
+    Call(CopyDescMetadata(&pDstMeta->pvarRatingStars, pSrcMeta->pvarRatingStars));
+    Call(CopyDescMetadata(&pDstMeta->pvarRatingValue, pSrcMeta->pvarRatingValue));
+    Call(CopyDescMetadata(&pDstMeta->pvarCaption, pSrcMeta->pvarCaption));
+    Call(CopyDescMetadata(&pDstMeta->pvarDocumentName, pSrcMeta->pvarDocumentName));
+    Call(CopyDescMetadata(&pDstMeta->pvarPageName, pSrcMeta->pvarPageName));
+    Call(CopyDescMetadata(&pDstMeta->pvarPageNumber, pSrcMeta->pvarPageNumber));
+    Call(CopyDescMetadata(&pDstMeta->pvarHostComputer, pSrcMeta->pvarHostComputer));
 
 Cleanup:
     return err;
@@ -1178,7 +1178,7 @@ ERR PKImageEncode_WritePixels_WMP(
     if (!pIE->fHeaderDone)
     {
         // write metadata
-        JXR_Call(WriteContainerPre(pIE));
+        Call(WriteContainerPre(pIE));
 
         pIE->fHeaderDone = !FALSE;
     }
@@ -1187,12 +1187,12 @@ ERR PKImageEncode_WritePixels_WMP(
         pIE->WMP.wmiSCP_Alpha = pIE->WMP.wmiSCP;
     }
 */
-    JXR_Call(PKImageEncode_EncodeContent(pIE, PI, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeContent(pIE, PI, cLine, pbPixels, cbStride));
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2){//planar alpha
-        JXR_Call(PKImageEncode_EncodeAlpha(pIE, PI, cLine, pbPixels, cbStride));
+        Call(PKImageEncode_EncodeAlpha(pIE, PI, cLine, pbPixels, cbStride));
     }
     
-    JXR_Call(WriteContainerPost(pIE));
+    Call(WriteContainerPost(pIE));
 
 Cleanup:
     return err;
@@ -1223,7 +1223,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     struct WMPStream *pPATempFile = pIE->WMP.pPATempFile;
 
     // Unless this is the last call, reject inputs which are not multiples of 16
-    JXR_FailIf(!fLastCall && 0 != cLine % 16, WMP_errMustBeMultipleOf16LinesUntilLastCall);
+    FailIf(!fLastCall && 0 != cLine % 16, WMP_errMustBeMultipleOf16LinesUntilLastCall);
 
     if (!pIE->fHeaderDone || BANDEDENCSTATE_INIT == pIE->WMP.eBandedEncState)
     {
@@ -1235,7 +1235,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
         // Check if this is planar alpha: banded encode requires temp file
         if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
         {
-            JXR_FailIf(NULL == pPATempFile, WMP_errPlanarAlphaBandedEncRequiresTempFile);
+            FailIf(NULL == pPATempFile, WMP_errPlanarAlphaBandedEncRequiresTempFile);
         }
     }
 
@@ -1243,7 +1243,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     {
         // write metadata
         assert(fPI);
-        JXR_Call(WriteContainerPre(pIE));
+        Call(WriteContainerPre(pIE));
         pIE->fHeaderDone = !FALSE;
     }
 
@@ -1251,15 +1251,15 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     {
         // Record start of main content for future call to WriteContainerPost
         size_t offPos;
-        JXR_Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
+        Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
         pIE->WMP.nOffImage = (Long)offPos;
 
         assert(fPI);
-        JXR_Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
+        Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
         pIE->WMP.eBandedEncState = BANDEDENCSTATE_ENCODING;
     }
 
-    JXR_Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
+    Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {
         //planar alpha
@@ -1268,16 +1268,16 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
             size_t  offStart;
 
             // We assume the following which allows us to avoid saving state
-            JXR_Call(pPATempFile->GetPos(pPATempFile, &offStart));
+            Call(pPATempFile->GetPos(pPATempFile, &offStart));
             assert(0 == offStart);
             assert(pIE->WMP.wmiSCP_Alpha.pWStream == pIE->WMP.wmiSCP.pWStream);
 
             // For planar alpha, we write the file to a temp file
             pIE->WMP.wmiSCP_Alpha.pWStream = pPATempFile;
-            JXR_Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
+            Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
         }
 
-        JXR_Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
+        Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
     }
 
 Cleanup:
@@ -1293,8 +1293,8 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
     assert(BANDEDENCSTATE_ENCODING == pIE->WMP.eBandedEncState);
 
     // Finish off main content, update its length ptr for WriteContainerPost
-    JXR_Call(PKImageEncode_EncodeContent_Term(pIE));
-    JXR_Call(pMainStream->GetPos(pIE->pStream, &offAlpha));
+    Call(PKImageEncode_EncodeContent_Term(pIE));
+    Call(pMainStream->GetPos(pIE->pStream, &offAlpha));
     pIE->WMP.nCbImage = (Long)offAlpha - pIE->WMP.nOffImage;
 
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
@@ -1306,22 +1306,22 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
         assert(pAlphaStream != pMainStream); // Otherwise we didn't use a temp file
 
         // Close it up - this causes write to temp file
-        JXR_Call(PKImageEncode_EncodeAlpha_Term(pIE));
+        Call(PKImageEncode_EncodeAlpha_Term(pIE));
 
         // Calculate size of alpha bitstream and its new offset
-        JXR_Call(pAlphaStream->GetPos(pAlphaStream, &cbAlpha));
+        Call(pAlphaStream->GetPos(pAlphaStream, &cbAlpha));
 
         // Copy alpha bitstream to end of main stream
         cbBytesCopied = 0;
-        JXR_Call(pAlphaStream->SetPos(pAlphaStream, 0));
+        Call(pAlphaStream->SetPos(pAlphaStream, 0));
         while (cbBytesCopied < cbAlpha)
         {
             char rgbBuf[TEMPFILE_COPYBUF_SIZE];
             size_t cbCopy;
 
             cbCopy = min(sizeof(rgbBuf), cbAlpha - cbBytesCopied);
-            JXR_Call(pAlphaStream->Read(pAlphaStream, rgbBuf, cbCopy));
-            JXR_Call(pMainStream->Write(pMainStream, rgbBuf, cbCopy));
+            Call(pAlphaStream->Read(pAlphaStream, rgbBuf, cbCopy));
+            Call(pMainStream->Write(pMainStream, rgbBuf, cbCopy));
 
             cbBytesCopied += cbCopy;
         }
@@ -1332,7 +1332,7 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
         pIE->WMP.nCbAlpha = (Long)cbAlpha;
     }
 
-    JXR_Call(WriteContainerPost(pIE));
+    Call(WriteContainerPost(pIE));
 
 Cleanup:
     return err;
@@ -1349,7 +1349,7 @@ ERR PKImageEncode_CreateNewFrame_WMP(
     UNREFERENCED_PARAMETER( pvParam );
     UNREFERENCED_PARAMETER( cbParam );
 
-    JXR_Call(WMP_errNotYetImplemented);
+    Call(WMP_errNotYetImplemented);
     
 Cleanup:
     return err;
@@ -1392,7 +1392,7 @@ ERR PKImageEncode_Release_WMP(
     FreeDescMetadata(&pIE->sDescMetadata.pvarPageNumber);
     FreeDescMetadata(&pIE->sDescMetadata.pvarHostComputer);
 
-    JXR_Call(PKFree((void **) ppIE));
+    Call(PKFree((void **) ppIE));
 
 Cleanup:
     return err;
@@ -1405,7 +1405,7 @@ ERR PKImageEncode_Create_WMP(PKImageEncode** ppIE)
 
     PKImageEncode* pIE = NULL;
 
-    JXR_Call(PKImageEncode_Create(ppIE));
+    Call(PKImageEncode_Create(ppIE));
 
     pIE = *ppIE;
     pIE->Initialize = PKImageEncode_Initialize_WMP;

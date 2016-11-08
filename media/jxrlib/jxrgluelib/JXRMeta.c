@@ -38,7 +38,7 @@
 ERR getbfcpy(U8* pbdest, const U8* pb, size_t cb, size_t ofs, U32 n)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + n > cb, WMP_errBufferOverflow);
+    FailIf(ofs + n > cb, WMP_errBufferOverflow);
     memcpy(pbdest, &pb[ofs], n);
 Cleanup:
     return err;
@@ -49,7 +49,7 @@ Cleanup:
 ERR getbfw(const U8* pb, size_t cb, size_t ofs, U16* pw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
     *pw = (U16)( pb[ofs] + ( pb[ofs + 1] << 8 ) );
 Cleanup:
     return err;
@@ -60,7 +60,7 @@ Cleanup:
 ERR getbfdw(const U8* pb, size_t cb, size_t ofs, U32* pdw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
     *pdw = pb[ofs] + ( pb[ofs + 1] << 8 ) + ( pb[ofs + 2] << 16UL ) + ( pb[ofs + 3] << 24UL );
 Cleanup:
     return err;
@@ -71,7 +71,7 @@ Cleanup:
 ERR getbfwbig(const U8* pb, size_t cb, size_t ofs, U16* pw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
     *pw = (U16)( pb[ofs + 1] + ( pb[ofs] << 8 ) );
 Cleanup:
     return err;
@@ -82,7 +82,7 @@ Cleanup:
 ERR getbfdwbig(const U8* pb, size_t cb, size_t ofs, U32* pdw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
     *pdw = pb[ofs + 3] + ( pb[ofs + 2] << 8 ) + ( pb[ofs + 1] << 16UL ) + ( pb[ofs] << 24UL );
 Cleanup:
     return err;
@@ -113,7 +113,7 @@ ERR getbfdwe(const U8* pb, size_t cb, size_t ofs, U32* pdw, U8 endian)
 ERR setbfcpy(U8* pb, size_t cb, size_t ofs, const U8* pbset, size_t cbset)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + cbset > cb, WMP_errBufferOverflow);
+    FailIf(ofs + cbset > cb, WMP_errBufferOverflow);
     memcpy(&pb[ofs], pbset, cbset);
 Cleanup:
     return err;
@@ -124,7 +124,7 @@ Cleanup:
 ERR setbfw(U8* pb, size_t cb, size_t ofs, U16 dw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
     pb[ofs] = (U8)dw;
     pb[ofs + 1] = (U8)( dw >> 8 );
 Cleanup:
@@ -136,7 +136,7 @@ Cleanup:
 ERR setbfdw(U8* pb, size_t cb, size_t ofs, U32 dw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
     pb[ofs] = (U8)dw;
     pb[ofs + 1] = (U8)( dw >> 8 );
     pb[ofs + 2] = (U8)( dw >> 16 );
@@ -150,7 +150,7 @@ Cleanup:
 ERR setbfwbig(U8* pb, size_t cb, size_t ofs, U16 dw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U16) > cb, WMP_errBufferOverflow);
     pb[ofs + 1] = (U8)dw;
     pb[ofs] = (U8)( dw >> 8 );
 Cleanup:
@@ -162,7 +162,7 @@ Cleanup:
 ERR setbfdwbig(U8* pb, size_t cb, size_t ofs, U32 dw)
 {
     ERR err = WMP_errSuccess;
-    JXR_FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
+    FailIf(ofs + sizeof(U32) > cb, WMP_errBufferOverflow);
     pb[ofs + 3] = (U8)dw;
     pb[ofs + 2] = (U8)( dw >> 8 );
     pb[ofs + 1] = (U8)( dw >> 16 );
@@ -195,7 +195,7 @@ ERR BufferCalcIFDSize(const U8* pbdata, size_t cbdata, U32 ofsifd, U8 endian, U3
     U32 cbInteroperabilityIFD = 0;
 
     *pcbifd = 0;
-    JXR_Call(getbfwe(pbdata, cbdata, ofsifd, &cDir, endian));
+    Call(getbfwe(pbdata, cbdata, ofsifd, &cDir, endian));
 
     cbifd = sizeof(U16) + cDir * SizeofIFDEntry + sizeof(U32);
     ofsdir = ofsifd + sizeof(U16);
@@ -207,22 +207,22 @@ ERR BufferCalcIFDSize(const U8* pbdata, size_t cbdata, U32 ofsifd, U8 endian, U3
         U32 value;
         U32 datasize;
 
-        JXR_Call(getbfwe(pbdata, cbdata, ofsdir, &tag, endian));
-        JXR_Call(getbfwe(pbdata, cbdata, ofsdir + sizeof(U16), &type, endian));
-        JXR_Call(getbfdwe(pbdata, cbdata, ofsdir + 2 * sizeof(U16), &count, endian));
-        JXR_Call(getbfdwe(pbdata, cbdata, ofsdir + 2 * sizeof(U16) + sizeof(U32), &value, endian));
-        JXR_FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
+        Call(getbfwe(pbdata, cbdata, ofsdir, &tag, endian));
+        Call(getbfwe(pbdata, cbdata, ofsdir + sizeof(U16), &type, endian));
+        Call(getbfdwe(pbdata, cbdata, ofsdir + 2 * sizeof(U16), &count, endian));
+        Call(getbfdwe(pbdata, cbdata, ofsdir + 2 * sizeof(U16) + sizeof(U32), &value, endian));
+        FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
         if ( tag == WMP_tagEXIFMetadata )
         {
-            JXR_Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbEXIFIFD));
+            Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbEXIFIFD));
         }
         else if ( tag == WMP_tagGPSInfoMetadata )
         {
-            JXR_Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbGPSInfoIFD));
+            Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbGPSInfoIFD));
         }
         else if ( tag == WMP_tagInteroperabilityIFD )
         {
-            JXR_Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbInteroperabilityIFD));
+            Call(BufferCalcIFDSize(pbdata, cbdata, value, endian, &cbInteroperabilityIFD));
         }
         else
         {
@@ -260,10 +260,10 @@ ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32 *pcbifd)
     U32 cbInteroperabilityIFD = 0;
 
     *pcbifd = 0;
-    JXR_Call(pWS->GetPos(pWS, &offCurPos));
+    Call(pWS->GetPos(pWS, &offCurPos));
     GetPosOK = TRUE;
 
-    JXR_Call(GetUShort(pWS, uIFDOfs, &cDir));
+    Call(GetUShort(pWS, uIFDOfs, &cDir));
     cbifd = sizeof(U16) + cDir * SizeofIFDEntry + sizeof(U32);
     ofsdir = uIFDOfs + sizeof(U16);
     for ( i = 0; i < cDir; i++ )
@@ -274,22 +274,22 @@ ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32 *pcbifd)
         U32 value;
         U32 datasize;
 
-        JXR_Call(GetUShort(pWS, ofsdir, &tag));
-        JXR_Call(GetUShort(pWS, ofsdir + sizeof(U16), &type));
-        JXR_Call(GetULong(pWS, ofsdir + 2 * sizeof(U16), &count));
-        JXR_Call(GetULong(pWS, ofsdir + 2 * sizeof(U16) + sizeof(U32), &value));
-        JXR_FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errUnsupportedFormat);
+        Call(GetUShort(pWS, ofsdir, &tag));
+        Call(GetUShort(pWS, ofsdir + sizeof(U16), &type));
+        Call(GetULong(pWS, ofsdir + 2 * sizeof(U16), &count));
+        Call(GetULong(pWS, ofsdir + 2 * sizeof(U16) + sizeof(U32), &value));
+        FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errUnsupportedFormat);
         if ( tag == WMP_tagEXIFMetadata )
         {
-            JXR_Call(StreamCalcIFDSize(pWS, value, &cbEXIFIFD));
+            Call(StreamCalcIFDSize(pWS, value, &cbEXIFIFD));
         }
         else if ( tag == WMP_tagGPSInfoMetadata )
         {
-            JXR_Call(StreamCalcIFDSize(pWS, value, &cbGPSInfoIFD));
+            Call(StreamCalcIFDSize(pWS, value, &cbGPSInfoIFD));
         }
         else if ( tag == WMP_tagInteroperabilityIFD )
         {
-            JXR_Call(StreamCalcIFDSize(pWS, value, &cbInteroperabilityIFD));
+            Call(StreamCalcIFDSize(pWS, value, &cbInteroperabilityIFD));
         }
         else
         {
@@ -309,7 +309,7 @@ ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32 *pcbifd)
 
 Cleanup:
     if ( GetPosOK )
-        JXR_Call(pWS->SetPos(pWS, offCurPos));
+        Call(pWS->SetPos(pWS, offCurPos));
     return ( err );
 }
 
@@ -336,8 +336,8 @@ ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdst, 
     U32 ofsdstdir;
     U32 ofsnextifd;
 
-    JXR_Call(getbfwe(pbsrc, cbsrc, ofssrc, &cDir, endian));
-    JXR_Call(setbfw(pbdst, cbdst, ofsdst, cDir));
+    Call(getbfwe(pbsrc, cbsrc, ofssrc, &cDir, endian));
+    Call(setbfw(pbdst, cbdst, ofsdst, cDir));
     ofsnextifd = ofsdst + sizeof(U16) + SizeofIFDEntry * cDir;
     ofsdstnextdata = ofsnextifd + sizeof(U32);
 
@@ -351,19 +351,19 @@ ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdst, 
         U32 value;
         U32 size;
 
-        JXR_Call(getbfwe(pbsrc, cbsrc, ofssrcdir, &tag, endian));
-        JXR_Call(setbfw(pbdst, cbdst, ofsdstdir, tag));
+        Call(getbfwe(pbsrc, cbsrc, ofssrcdir, &tag, endian));
+        Call(setbfw(pbdst, cbdst, ofsdstdir, tag));
 
-        JXR_Call(getbfwe(pbsrc, cbsrc, ofssrcdir + sizeof(U16), &type, endian));
-        JXR_Call(setbfw(pbdst, cbdst, ofsdstdir + sizeof(U16), type));
+        Call(getbfwe(pbsrc, cbsrc, ofssrcdir + sizeof(U16), &type, endian));
+        Call(setbfw(pbdst, cbdst, ofsdstdir + sizeof(U16), type));
 
-        JXR_Call(getbfdwe(pbsrc, cbsrc, ofssrcdir + 2 * sizeof(U16), &count, endian));
-        JXR_Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16), count));
+        Call(getbfdwe(pbsrc, cbsrc, ofssrcdir + 2 * sizeof(U16), &count, endian));
+        Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16), count));
 
-        JXR_Call(getbfdwe(pbsrc, cbsrc, ofssrcdir + 2 * sizeof(U16) + sizeof(U32), &value, endian));
-        JXR_Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16) + sizeof(U32), 0));
+        Call(getbfdwe(pbsrc, cbsrc, ofssrcdir + 2 * sizeof(U16) + sizeof(U32), &value, endian));
+        Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16) + sizeof(U32), 0));
 
-        JXR_FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
+        FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
         if ( tag == WMP_tagEXIFMetadata )
         {
             ofsEXIFIFDEntry = (U16) ofsdstdir;
@@ -387,11 +387,11 @@ ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdst, 
             if ( size > 4 )
             {
                 ofssrcdata = value;
-                JXR_Call(setbfdw(pbdst, cbdst, ofsdstdata, ofsdstnextdata));
+                Call(setbfdw(pbdst, cbdst, ofsdstdata, ofsdstnextdata));
                 ofsdstdata = ofsdstnextdata;
                 ofsdstnextdata += size;
             }
-            JXR_FailIf(ofssrcdata + size > cbsrc || ofsdstdata + size > cbdst, WMP_errBufferOverflow);
+            FailIf(ofssrcdata + size > cbsrc || ofsdstdata + size > cbdst, WMP_errBufferOverflow);
             if ( size == count || endian == WMP_INTEL_ENDIAN )
                 // size == count means 8-bit data means endian doesn't matter
                 memcpy(&pbdst[ofsdstdata], &pbsrc[ofssrcdata], size);
@@ -439,25 +439,25 @@ ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdst, 
         ofssrcdir += SizeofIFDEntry;
         ofsdstdir += SizeofIFDEntry;
     }
-    JXR_Call(setbfdw(pbdst, cbdst, ofsnextifd, 0));    // no nextIFD
+    Call(setbfdw(pbdst, cbdst, ofsnextifd, 0));    // no nextIFD
 
     if ( ofsEXIFIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsEXIFIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(BufferCopyIFD(pbsrc, cbsrc, ofsEXIFIFD, endian, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsEXIFIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(BufferCopyIFD(pbsrc, cbsrc, ofsEXIFIFD, endian, pbdst, cbdst, &ofsdstnextdata));
     }
     if ( ofsGPSInfoIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsGPSInfoIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(BufferCopyIFD(pbsrc, cbsrc, ofsGPSInfoIFD, endian, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsGPSInfoIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(BufferCopyIFD(pbsrc, cbsrc, ofsGPSInfoIFD, endian, pbdst, cbdst, &ofsdstnextdata));
     }
     if ( ofsInteroperabilityIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsInteroperabilityIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(BufferCopyIFD(pbsrc, cbsrc, ofsInteroperabilityIFD, endian, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsInteroperabilityIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(BufferCopyIFD(pbsrc, cbsrc, ofsInteroperabilityIFD, endian, pbdst, cbdst, &ofsdstnextdata));
     }
     *pofsdst = ofsdstnextdata;
 
@@ -490,11 +490,11 @@ ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* 
     U32 ofsdstdir;
     U32 ofsnextifd;
 
-    JXR_Call(pWS->GetPos(pWS, &offCurPos));
+    Call(pWS->GetPos(pWS, &offCurPos));
     GetPosOK = TRUE;
 
-    JXR_Call(GetUShort(pWS, ofssrc, &cDir));
-    JXR_Call(setbfw(pbdst, cbdst, ofsdst, cDir));
+    Call(GetUShort(pWS, ofssrc, &cDir));
+    Call(setbfw(pbdst, cbdst, ofsdst, cDir));
 
     ofsnextifd = ofsdst + sizeof(U16) + SizeofIFDEntry * cDir;
     ofsdstnextdata = ofsnextifd + sizeof(U32);
@@ -509,19 +509,19 @@ ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* 
         U32 value;
         U32 size;
 
-        JXR_Call(GetUShort(pWS, ofssrcdir, &tag));
-        JXR_Call(setbfw(pbdst, cbdst, ofsdstdir, tag));
+        Call(GetUShort(pWS, ofssrcdir, &tag));
+        Call(setbfw(pbdst, cbdst, ofsdstdir, tag));
 
-        JXR_Call(GetUShort(pWS, ofssrcdir + sizeof(U16), &type));
-        JXR_Call(setbfw(pbdst, cbdst, ofsdstdir + sizeof(U16), type));
+        Call(GetUShort(pWS, ofssrcdir + sizeof(U16), &type));
+        Call(setbfw(pbdst, cbdst, ofsdstdir + sizeof(U16), type));
 
-        JXR_Call(GetULong(pWS, ofssrcdir + 2 * sizeof(U16), &count));
-        JXR_Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16), count));
+        Call(GetULong(pWS, ofssrcdir + 2 * sizeof(U16), &count));
+        Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16), count));
 
-        JXR_Call(GetULong(pWS, ofssrcdir + 2 * sizeof(U16) + sizeof(U32), &value));
-        JXR_Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16) + sizeof(U32), 0));
+        Call(GetULong(pWS, ofssrcdir + 2 * sizeof(U16) + sizeof(U32), &value));
+        Call(setbfdw(pbdst, cbdst, ofsdstdir + 2 * sizeof(U16) + sizeof(U32), 0));
 
-        JXR_FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
+        FailIf(type == 0 || type >= sizeof(IFDEntryTypeSizes) / sizeof(IFDEntryTypeSizes[0]), WMP_errFail);
         if ( tag == WMP_tagEXIFMetadata )
         {
             ofsEXIFIFDEntry = (U16) ofsdstdir;
@@ -545,42 +545,42 @@ ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* 
             if ( size > 4 )
             {
                 ofssrcdata = value;
-                JXR_Call(setbfdw(pbdst, cbdst, ofsdstdata, ofsdstnextdata));
+                Call(setbfdw(pbdst, cbdst, ofsdstdata, ofsdstnextdata));
                 ofsdstdata = ofsdstnextdata;
                 ofsdstnextdata += size;
             }
-            JXR_FailIf(ofsdstdata + size > cbdst, WMP_errBufferOverflow);
-            JXR_Call(pWS->SetPos(pWS, ofssrcdata));
-            JXR_Call(pWS->Read(pWS, &pbdst[ofsdstdata], size));
+            FailIf(ofsdstdata + size > cbdst, WMP_errBufferOverflow);
+            Call(pWS->SetPos(pWS, ofssrcdata));
+            Call(pWS->Read(pWS, &pbdst[ofsdstdata], size));
         }
         ofssrcdir += SizeofIFDEntry;
         ofsdstdir += SizeofIFDEntry;
     }
-    JXR_Call(setbfdw(pbdst, cbdst, ofsnextifd, 0));    // no nextIFD
+    Call(setbfdw(pbdst, cbdst, ofsnextifd, 0));    // no nextIFD
 
     if ( ofsEXIFIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsEXIFIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(StreamCopyIFD(pWS, ofsEXIFIFD, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsEXIFIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(StreamCopyIFD(pWS, ofsEXIFIFD, pbdst, cbdst, &ofsdstnextdata));
     }
     if ( ofsGPSInfoIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsGPSInfoIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(StreamCopyIFD(pWS, ofsGPSInfoIFD, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsGPSInfoIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(StreamCopyIFD(pWS, ofsGPSInfoIFD, pbdst, cbdst, &ofsdstnextdata));
     }
     if ( ofsInteroperabilityIFDEntry != 0 )
     {
         ofsdstnextdata += ( ofsdstnextdata & 1 );
-        JXR_Call(setbfdw(pbdst, cbdst, ofsInteroperabilityIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
-        JXR_Call(StreamCopyIFD(pWS, ofsInteroperabilityIFD, pbdst, cbdst, &ofsdstnextdata));
+        Call(setbfdw(pbdst, cbdst, ofsInteroperabilityIFDEntry + 2 * sizeof(U16) + sizeof(U32), ofsdstnextdata));
+        Call(StreamCopyIFD(pWS, ofsInteroperabilityIFD, pbdst, cbdst, &ofsdstnextdata));
     }
     *pofsdst = ofsdstnextdata;
 
 Cleanup:
     if ( GetPosOK )
-        JXR_Call(pWS->SetPos(pWS, offCurPos));
+        Call(pWS->SetPos(pWS, offCurPos));
     return err;
 }
 
@@ -595,10 +595,10 @@ ERR GetUShort(
     ERR err = WMP_errSuccess;
     U8  cVal;
 
-    JXR_Call(pWS->SetPos(pWS, offPos));
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->SetPos(pWS, offPos));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] = (U16) cVal;
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] += ((U16) cVal) << 8;
 
 Cleanup:
@@ -613,10 +613,10 @@ ERR PutUShort(
     ERR err = WMP_errSuccess;
     U8  cVal = (U8) uValue;
 
-    JXR_Call(pWS->SetPos(pWS, offPos));
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->SetPos(pWS, offPos));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
     cVal = (U8) (uValue >> 8);
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
 
 Cleanup:
     return err;
@@ -630,14 +630,14 @@ ERR GetULong(
     ERR err = WMP_errSuccess;
     U8  cVal;
 
-    JXR_Call(pWS->SetPos(pWS, offPos));
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->SetPos(pWS, offPos));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] = (U32) cVal;
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] += ((U32) cVal) << 8;
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] += ((U32) cVal) << 16;
-    JXR_Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Read(pWS, &cVal, sizeof(cVal)));
     puValue[0] += ((U32) cVal) << 24;
  
 Cleanup:
@@ -652,14 +652,14 @@ ERR PutULong(
     ERR err = WMP_errSuccess;
     U8  cVal = (U8) uValue;
 
-    JXR_Call(pWS->SetPos(pWS, offPos));
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->SetPos(pWS, offPos));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
     cVal = (U8) (uValue >> 8);
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
     cVal = (U8) (uValue >> 16);
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
     cVal = (U8) (uValue >> 24);
-    JXR_Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
+    Call(pWS->Write(pWS, &cVal, sizeof(cVal)));
 
 Cleanup:
     return err;
@@ -674,7 +674,7 @@ ERR ReadBinaryData(__in_ecount(1) struct WMPStream* pWS,
     ERR err = WMP_errSuccess;
     U8 *pbData = NULL;
 
-    JXR_Call(PKAlloc((void **) &pbData, uCount + 2)); // Allocate buffer to store data with space for an added ascii or unicode null
+    Call(PKAlloc((void **) &pbData, uCount + 2)); // Allocate buffer to store data with space for an added ascii or unicode null
     if (uCount <= 4)
     {
         unsigned int i;
@@ -685,16 +685,16 @@ ERR ReadBinaryData(__in_ecount(1) struct WMPStream* pWS,
     {
         size_t offPosPrev;
 
-        JXR_Call(pWS->GetPos(pWS, &offPosPrev));
-        JXR_Call(pWS->SetPos(pWS, uValue));
-        JXR_Call(pWS->Read(pWS, pbData, uCount));
-        JXR_Call(pWS->SetPos(pWS, offPosPrev));
+        Call(pWS->GetPos(pWS, &offPosPrev));
+        Call(pWS->SetPos(pWS, uValue));
+        Call(pWS->Read(pWS, pbData, uCount));
+        Call(pWS->SetPos(pWS, offPosPrev));
     }
 
     *ppbData = pbData;
 
 Cleanup:
-    if (JXR_Failed(err))
+    if (Failed(err))
     {
         if (pbData)
             PKFree((void **) &pbData);
@@ -720,7 +720,7 @@ ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
     {
         case WMP_typASCII:
             pvar->vt = DPKVT_LPSTR;
-            JXR_Call(ReadBinaryData(pWS, uCount, uValue, (U8 **) &pvar->VT.pszVal));
+            Call(ReadBinaryData(pWS, uCount, uValue, (U8 **) &pvar->VT.pszVal));
             assert(0 == pvar->VT.pszVal[uCount - 1]); // Check that it's null-terminated
             // make sure (ReadBinaryData allocated uCount + 2 so this and unicode can have forced nulls)
             pvar->VT.pszVal[uCount] = 0;
@@ -732,7 +732,7 @@ ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
             // used to convey unicode (which does not require a count field). Caller knows
             // uCount and can convert to safearray if necessary.
             pvar->vt = (DPKVT_BYREF | DPKVT_UI1);
-            JXR_Call(ReadBinaryData(pWS, uCount, uValue, &pvar->VT.pbVal));
+            Call(ReadBinaryData(pWS, uCount, uValue, &pvar->VT.pbVal));
             break;
 
         case WMP_typSHORT:
@@ -749,13 +749,13 @@ ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
             else
             {
                 assert(FALSE); // NYI
-                JXR_FailIf(TRUE, WMP_errNotYetImplemented);
+                FailIf(TRUE, WMP_errNotYetImplemented);
             }
             break;
 
         default:
             assert(FALSE); // Unhandled type
-            JXR_FailIf(TRUE, WMP_errNotYetImplemented);
+            FailIf(TRUE, WMP_errNotYetImplemented);
             break;
     }
 
@@ -783,9 +783,9 @@ ERR WriteWmpDE(
         *pcbDataWrittenToOffset = 0;
     }
 
-    JXR_Call(PutUShort(pWS, offPos, pDE->uTag)); offPos += 2;
-    JXR_Call(PutUShort(pWS, offPos, pDE->uType)); offPos += 2;
-    JXR_Call(PutULong(pWS, offPos, pDE->uCount)); offPos += 4;
+    Call(PutUShort(pWS, offPos, pDE->uTag)); offPos += 2;
+    Call(PutUShort(pWS, offPos, pDE->uType)); offPos += 2;
+    Call(PutULong(pWS, offPos, pDE->uCount)); offPos += 4;
 
     switch (pDE->uType)
     {
@@ -796,24 +796,24 @@ ERR WriteWmpDE(
             if (pDE->uCount <= 4)
             {
                 U8 pad[4] = {0};
-                JXR_Call(pWS->SetPos(pWS, offPos));
+                Call(pWS->SetPos(pWS, offPos));
 
                 if (NULL == pbData)
                     pbData = (U8*)&pDE->uValueOrOffset;
 
-                JXR_Call(pWS->Write(pWS, pbData, pDE->uCount));
-                JXR_Call(pWS->Write(pWS, pad, 4 - pDE->uCount)); offPos += 4;
+                Call(pWS->Write(pWS, pbData, pDE->uCount));
+                Call(pWS->Write(pWS, pad, 4 - pDE->uCount)); offPos += 4;
             }
             else
             {
-                JXR_Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
+                Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
 
                 // Write the data if requested to do so
                 if (pbData)
                 {
-                    JXR_Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
-                    JXR_Call(pWS->Write(pWS, pbData, pDE->uCount));
-                    JXR_Call(pWS->SetPos(pWS, offPos));
+                    Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
+                    Call(pWS->Write(pWS, pbData, pDE->uCount));
+                    Call(pWS->SetPos(pWS, offPos));
                     *pcbDataWrittenToOffset = pDE->uCount;
                 }
             }
@@ -837,25 +837,25 @@ ERR WriteWmpDE(
                     uiShrt2 = *(U16*)(pbData + 2);
                 }
 
-                JXR_Call(PutUShort(pWS, offPos, uiShrt1)); offPos += 2;
-                JXR_Call(PutUShort(pWS, offPos, uiShrt2)); offPos += 2;
+                Call(PutUShort(pWS, offPos, uiShrt1)); offPos += 2;
+                Call(PutUShort(pWS, offPos, uiShrt2)); offPos += 2;
             }
             else
             {
                 assert(FALSE); // Untested - remove this assert after this has been tested
-                JXR_Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
+                Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
 
                 // Write the data if requested to do so
                 if (pbData)
                 {
                     U32 i;
-                    JXR_Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
+                    Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
                     for (i = 0; i < pDE->uCount; i++)
                     {
                         const U16 uiShort = *(U16*)(pbData + i*sizeof(U16));
-                        JXR_Call(PutUShort(pWS, offPos, uiShort)); // Write one at a time for endian purposes - but inefficient
+                        Call(PutUShort(pWS, offPos, uiShort)); // Write one at a time for endian purposes - but inefficient
                     }
-                    JXR_Call(pWS->SetPos(pWS, offPos));
+                    Call(pWS->SetPos(pWS, offPos));
                     *pcbDataWrittenToOffset = pDE->uCount * sizeof(U16);
                 }
 
@@ -869,24 +869,24 @@ ERR WriteWmpDE(
                 if (NULL == pbData)
                     pbData = (U8*)&pDE->uValueOrOffset;
 
-                JXR_Call(PutULong(pWS, offPos, *(U32*)pbData)); offPos += 4;
+                Call(PutULong(pWS, offPos, *(U32*)pbData)); offPos += 4;
             }
             else
             {
                 assert(FALSE); // Untested - remove this assert after this has been tested
-                JXR_Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
+                Call(PutULong(pWS, offPos, pDE->uValueOrOffset)); offPos += 4;
 
                 // Write the data if requested to do so
                 if (pbData)
                 {
                     U32 i;
-                    JXR_Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
+                    Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
                     for (i = 0; i < pDE->uCount; i++)
                     {
                         const U32 uLong = *(U32*)(pbData + i*sizeof(U32));
-                        JXR_Call(PutULong(pWS, offPos, uLong)); // Write one at a time for endian purposes - but inefficient
+                        Call(PutULong(pWS, offPos, uLong)); // Write one at a time for endian purposes - but inefficient
                     }
-                    JXR_Call(pWS->SetPos(pWS, offPos));
+                    Call(pWS->SetPos(pWS, offPos));
                     *pcbDataWrittenToOffset = pDE->uCount * sizeof(U32);
                 }
             }
@@ -894,7 +894,7 @@ ERR WriteWmpDE(
 
         default:
             assert(FALSE); // Alert the programmer
-            JXR_Call(WMP_errInvalidParameter);
+            Call(WMP_errInvalidParameter);
             break;
     }
 

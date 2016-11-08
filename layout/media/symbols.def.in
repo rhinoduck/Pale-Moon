@@ -252,7 +252,7 @@ jpeg_abort
 jpeg_abort_decompress
 jpeg_read_raw_data
 #endif
-;+# TODO: [rhinoduck] ifdef jxr
+#if defined (MOZ_JXR) && !defined(MOZ_NATIVE_JXR)
 ImageStrDecGetInfo
 CalcThumbnailSize
 GetIndexTable
@@ -275,7 +275,7 @@ EndDecodingSubband
 BGR24_RGB24
 BGRA32_RGBA32
 SetCurrentTileRow
-;+# TODO: [rhinoduck] endif jxr
+#endif
 #ifndef MOZ_NATIVE_WEBP
 WebPInitDecBufferInternal
 WebPFreeDecBuffer

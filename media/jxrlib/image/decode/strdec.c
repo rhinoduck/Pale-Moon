@@ -69,16 +69,16 @@ static ERR readQuantizerSB(U8 pQPIndex[MAX_CHANNELS], SimpleBitIO * pIO, size_t 
 
     if(cChannel > 1)
     {
-        JXR_Call(getBit32_SB(pIO, 2, &val)); // Channel mode
+        Call(getBit32_SB(pIO, 2, &val)); // Channel mode
         *pcChMode = (U8)val;
     }
 
-    JXR_Call(getBit32_SB(pIO, 8, &val)); // Y
+    Call(getBit32_SB(pIO, 8, &val)); // Y
     pQPIndex[0] = (U8)val;
 
     if(1 == *pcChMode)  // MIXED
     {
-        JXR_Call(getBit32_SB(pIO, 8, &val)); // UV;
+        Call(getBit32_SB(pIO, 8, &val)); // UV;
         pQPIndex[1] = (U8)val;
     }
     else if(*pcChMode > 0){ // INDEPENDENT
@@ -88,7 +88,7 @@ static ERR readQuantizerSB(U8 pQPIndex[MAX_CHANNELS], SimpleBitIO * pIO, size_t 
         {
 #pragma prefast(suppress: __WARNING_UNRELATED_LOOP_TERMINATION_NO_SIZEEXPR, "PREfast false alarm: 1 <= i < MAX_CHANNELS, no buffer over/underrun!")
             U32 val32;
-            JXR_Call(getBit32_SB(pIO, 8, &val32)); // UV
+            Call(getBit32_SB(pIO, 8, &val32)); // UV
             pQPIndex[i] = (U8)val32;
         }
     }
@@ -3096,17 +3096,17 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
     ERR err = WMP_errSuccess;
 
     U32 val32;
-    JXR_Call(getBit32_SB(pSB, 3, &val32));
+    Call(getBit32_SB(pSB, 3, &val32));
     pSC->cfColorFormat = (COLORFORMAT)val32; // internal color format
 
-    JXR_FailIf((pSC->cfColorFormat < Y_ONLY || pSC->cfColorFormat > NCOMPONENT), WMP_errUnsupportedFormat);
+    FailIf((pSC->cfColorFormat < Y_ONLY || pSC->cfColorFormat > NCOMPONENT), WMP_errUnsupportedFormat);
     pSCP->cfColorFormat = pSC->cfColorFormat;  // this should be removed later
 
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSC->bScaledArith = val32; // lossless mode
 
     // subbands
-    JXR_Call(getBit32_SB(pSB, 4, &val32));
+    Call(getBit32_SB(pSB, 4, &val32));
     pSCP->sbAvailSubband = (SUBBAND)val32;
 
     // color parameters
@@ -3119,31 +3119,31 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
     case YUV_420:
         pSC->cNumChannels = 3;
         getBit32_SB(pSB, 1, &val32);
-        JXR_Call(getBit32_SB(pSB, 3, &val32));
+        Call(getBit32_SB(pSB, 3, &val32));
         pII->cChromaCenteringX = (U8)val32;
         getBit32_SB(pSB, 1, &val32);
-        JXR_Call(getBit32_SB(pSB, 3, &val32));
+        Call(getBit32_SB(pSB, 3, &val32));
         pII->cChromaCenteringY = (U8)val32;
         break;
 
     case YUV_422:
         pSC->cNumChannels = 3;
-        JXR_Call(getBit32_SB(pSB, 1, &val32));
-        JXR_Call(getBit32_SB(pSB, 3, &val32));
+        Call(getBit32_SB(pSB, 1, &val32));
+        Call(getBit32_SB(pSB, 3, &val32));
         pII->cChromaCenteringX = (U8)val32;
-        JXR_Call(getBit32_SB(pSB, 4, &val32));
+        Call(getBit32_SB(pSB, 4, &val32));
         break;
 
     case YUV_444:
         pSC->cNumChannels = 3;
-        JXR_Call(getBit32_SB(pSB, 4, &val32));
-        JXR_Call(getBit32_SB(pSB, 4, &val32));
+        Call(getBit32_SB(pSB, 4, &val32));
+        Call(getBit32_SB(pSB, 4, &val32));
         break;
 
     case NCOMPONENT:
-        JXR_Call(getBit32_SB(pSB, 4, &val32));
+        Call(getBit32_SB(pSB, 4, &val32));
         pSC->cNumChannels = (Int)val32 + 1;
-        JXR_Call(getBit32_SB(pSB, 4, &val32));
+        Call(getBit32_SB(pSB, 4, &val32));
         break;
 
     case CMYK:
@@ -3161,14 +3161,14 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
     case BD_16S:
     case BD_32:
     case BD_32S:
-        JXR_Call(getBit32_SB(pSB, 8, &val32));
+        Call(getBit32_SB(pSB, 8, &val32));
         pSCP->nLenMantissaOrShift = (U8)val32;
         break;
 
     case BD_32F:
-        JXR_Call(getBit32_SB(pSB, 8, &val32));
+        Call(getBit32_SB(pSB, 8, &val32));
         pSCP->nLenMantissaOrShift = (U8)val32;//float conversion parameters
-        JXR_Call(getBit32_SB(pSB, 8, &val32));
+        Call(getBit32_SB(pSB, 8, &val32));
         pSCP->nExpBias = (I8)val32;
         break;
 
@@ -3179,12 +3179,12 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
     // quantization
     pSC->uQPMode = 0;
 
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
 
     if (1 == val32) // DC uniform
     {
         U8 val;
-        JXR_Call(readQuantizerSB(pSC->uiQPIndexDC, pSB, pSC->cNumChannels, &val));
+        Call(readQuantizerSB(pSC->uiQPIndexDC, pSB, pSC->cNumChannels, &val));
         pSC->uQPMode += (val << 3);
     }
     else
@@ -3192,18 +3192,18 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
 
     if (pSCP->sbAvailSubband != SB_DC_ONLY)
     {
-        JXR_Call(getBit32_SB(pSB, 1, &val32));
+        Call(getBit32_SB(pSB, 1, &val32));
 
         if (0 == val32)
         {
             // don't use DC QP
             pSC->uQPMode += 0x200;
-            JXR_Call(getBit32_SB(pSB, 1, &val32));
+            Call(getBit32_SB(pSB, 1, &val32));
 
             if (1 == val32) // LP uniform
             {
                 U8 val;
-                JXR_Call(readQuantizerSB(pSC->uiQPIndexLP, pSB, pSC->cNumChannels, &val));
+                Call(readQuantizerSB(pSC->uiQPIndexLP, pSB, pSC->cNumChannels, &val));
                 pSC->uQPMode += (val << 5);
             }
             else
@@ -3215,18 +3215,18 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
         if (pSCP->sbAvailSubband != SB_NO_HIGHPASS)
         {
             U32 val32;
-            JXR_Call(getBit32_SB(pSB, 1, &val32));
+            Call(getBit32_SB(pSB, 1, &val32));
 
             if (0 == val32)
             {
                 // don't use LP QP
                 pSC->uQPMode += 0x400;
-                JXR_Call(getBit32_SB(pSB, 1, &val32));
+                Call(getBit32_SB(pSB, 1, &val32));
 
                 if (1 == val32) // HP uniform
                 {
                     U8 val;
-                    JXR_Call(readQuantizerSB(pSC->uiQPIndexHP, pSB, pSC->cNumChannels, &val));
+                    Call(readQuantizerSB(pSC->uiQPIndexHP, pSB, pSC->cNumChannels, &val));
                     pSC->uQPMode += (val << 7);
                 }
                 else
@@ -3242,7 +3242,7 @@ Int ReadImagePlaneHeader(CWMImageInfo* pII, CWMIStrCodecParam *pSCP,
     else if (pSCP->sbAvailSubband == SB_NO_HIGHPASS)
         pSC->uQPMode |= 0x400;
 
-    JXR_FailIf((pSC->uQPMode & 0x600) == 0, WMP_errInvalidParameter); // frame level QPs must be specified independently!
+    FailIf((pSC->uQPMode & 0x600) == 0, WMP_errInvalidParameter); // frame level QPs must be specified independently!
 
     flushToByte_SB(pSB);  // remove this later
 
@@ -3278,18 +3278,18 @@ Int ReadWMIHeader(
     //================================
 // 0
     /** signature **/
-    JXR_Call(pWS->Read(pWS, szMS, sizeof(szMS)));
-    JXR_FailIf(szMS != (U8 *) strstr((char *) szMS, "WMPHOTO"), WMP_errUnsupportedFormat);
+    Call(pWS->Read(pWS, szMS, sizeof(szMS)));
+    FailIf(szMS != (U8 *) strstr((char *) szMS, "WMPHOTO"), WMP_errUnsupportedFormat);
     //================================
-    JXR_Call(attach_SB(pSB, pWS));
+    Call(attach_SB(pSB, pWS));
 
 // 8
     /** codec version and subversion **/
-    JXR_Call(getBit32_SB(pSB, 4, &i));
-    JXR_FailIf((i != CODEC_VERSION), WMP_errIncorrectCodecVersion);
+    Call(getBit32_SB(pSB, 4, &i));
+    FailIf((i != CODEC_VERSION), WMP_errIncorrectCodecVersion);
     pSC->cVersion = i;
-    JXR_Call(getBit32_SB(pSB, 4, &i)); // subversion
-    JXR_FailIf((i != CODEC_SUBVERSION &&
+    Call(getBit32_SB(pSB, 4, &i)); // subversion
+    FailIf((i != CODEC_SUBVERSION &&
         i != CODEC_SUBVERSION_NEWSCALING_SOFT_TILES && i != CODEC_SUBVERSION_NEWSCALING_HARD_TILES),
         WMP_errIncorrectCodecSubVersion);
     pSC->cSubVersion = i;
@@ -3301,40 +3301,40 @@ Int ReadWMIHeader(
     pSCP->bUseHardTileBoundaries = pSC->bUseHardTileBoundaries;
 
 // 9 primary parameters
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     bTilingPresent = (Bool)val32; // tiling present
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSCP->bfBitstreamFormat = (BITSTREAMFORMAT)val32; // bitstream layout
-    JXR_Call(getBit32_SB(pSB, 3, &val32));
+    Call(getBit32_SB(pSB, 3, &val32));
     pII->oOrientation = (ORIENTATION)val32; // presentation orientation
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSC->bIndexTable = val32;
-    JXR_Call(getBit32_SB(pSB, 2, &i)); // overlap
-    JXR_FailIf((i == 3), WMP_errInvalidParameter);
+    Call(getBit32_SB(pSB, 2, &i)); // overlap
+    FailIf((i == 3), WMP_errInvalidParameter);
     pSCP->olOverlap = (OVERLAP)i;
 
 // 11 some other parameters
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     bAbbreviatedHeader = (Bool)val32; // short words for size and tiles
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSCP->bdBitDepth = (BITDEPTH)val32; // long word
     pSCP->bdBitDepth = BD_LONG; // remove when optimization is done
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     bInscribed = (Bool)val32; // windowing
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSC->bTrimFlexbitsFlag = (Bool)val32; // trim flexbits flag
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     bTileStretch = (Bool)val32; // tile stretching flag
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));
     pSC->bRBSwapped = (Bool)val32; // red-blue swap flag
-    JXR_Call(getBit32_SB(pSB, 1, &val32));  // padding / reserved bit
-    JXR_Call(getBit32_SB(pSB, 1, &val32));
+    Call(getBit32_SB(pSB, 1, &val32));  // padding / reserved bit
+    Call(getBit32_SB(pSB, 1, &val32));
     pSC->bAlphaChannel = (Bool)val32; // alpha channel present
 
 // 10 - informational
-    JXR_Call(getBit32_SB(pSB, 4, &val32));
+    Call(getBit32_SB(pSB, 4, &val32));
     pII->cfColorFormat = (COLORFORMAT)val32; // source color format
-    JXR_Call(getBit32_SB(pSB, 4, &val32));
+    Call(getBit32_SB(pSB, 4, &val32));
     pII->bdBitDepth = (BITDEPTH_BITS)val32; // source bit depth
 
     if(BD_1alt == pII->bdBitDepth)
@@ -3345,9 +3345,9 @@ Int ReadWMIHeader(
 
 // 12 - Variable length fields
 // size
-    JXR_Call(getBit32_SB(pSB, bAbbreviatedHeader ? 16 : 32, &val32));
+    Call(getBit32_SB(pSB, bAbbreviatedHeader ? 16 : 32, &val32));
     pII->cWidth = val32 + 1;
-    JXR_Call(getBit32_SB(pSB, bAbbreviatedHeader ? 16 : 32, &val32));
+    Call(getBit32_SB(pSB, bAbbreviatedHeader ? 16 : 32, &val32));
     pII->cHeight = val32 + 1;
     pSC->cExtraPixelsTop = pSC->cExtraPixelsLeft = pSC->cExtraPixelsBottom = pSC->cExtraPixelsRight = 0;
     if (bInscribed == FALSE && (pII->cWidth & 0xf) != 0)
@@ -3358,51 +3358,51 @@ Int ReadWMIHeader(
 // tiling
     pSCP->cNumOfSliceMinus1V = pSCP->cNumOfSliceMinus1H = 0;
     if (bTilingPresent) {
-        JXR_Call(getBit32_SB(pSB, LOG_MAX_TILES, &val32));
+        Call(getBit32_SB(pSB, LOG_MAX_TILES, &val32));
         pSCP->cNumOfSliceMinus1V = val32; // # of vertical slices along X axis
-        JXR_Call(getBit32_SB(pSB, LOG_MAX_TILES, &val32));
+        Call(getBit32_SB(pSB, LOG_MAX_TILES, &val32));
         pSCP->cNumOfSliceMinus1H = val32; // # of horizontal slices along Y axis
     }
-    JXR_FailIf((pSC->bIndexTable == FALSE) && (pSCP->bfBitstreamFormat == FREQUENCY || pSCP->cNumOfSliceMinus1V + pSCP->cNumOfSliceMinus1H > 0),
+    FailIf((pSC->bIndexTable == FALSE) && (pSCP->bfBitstreamFormat == FREQUENCY || pSCP->cNumOfSliceMinus1V + pSCP->cNumOfSliceMinus1H > 0),
         WMP_errUnsupportedFormat);
 
 // tile sizes
     pSCP->uiTileX[0] = pSCP->uiTileY[0] = 0;
     for(i = 0; i < pSCP->cNumOfSliceMinus1V; i ++){ // width in MB of vertical slices, not needed for last slice!
-        JXR_Call(getBit32_SB(pSB, bAbbreviatedHeader ? 8 : 16, &val32));
+        Call(getBit32_SB(pSB, bAbbreviatedHeader ? 8 : 16, &val32));
         pSCP->uiTileX[i + 1] = val32 + pSCP->uiTileX[i];
     }
     for(i = 0; i < pSCP->cNumOfSliceMinus1H; i ++){ // width in MB of vertical slices, not needed for last slice!
-        JXR_Call(getBit32_SB(pSB, bAbbreviatedHeader ? 8 : 16, &val32));
+        Call(getBit32_SB(pSB, bAbbreviatedHeader ? 8 : 16, &val32));
         pSCP->uiTileY[i + 1] = val32 + pSCP->uiTileY[i];
     }
     if (bTileStretch) {  // no handling of tile stretching enabled as of now
         for (i = 0; i < (pSCP->cNumOfSliceMinus1V + 1) * (pSCP->cNumOfSliceMinus1H + 1); i++)
-            JXR_Call(getBit32_SB(pSB, 8, &val32));
+            Call(getBit32_SB(pSB, 8, &val32));
     }
 
 // window due to compressed domain processing
     if (bInscribed) {
-        JXR_Call(getBit32_SB(pSB, 6, &val32));
+        Call(getBit32_SB(pSB, 6, &val32));
         pSC->cExtraPixelsTop = (U8)val32;
-        JXR_Call(getBit32_SB(pSB, 6, &val32));
+        Call(getBit32_SB(pSB, 6, &val32));
         pSC->cExtraPixelsLeft = (U8)val32;
-        JXR_Call(getBit32_SB(pSB, 6, &val32));
+        Call(getBit32_SB(pSB, 6, &val32));
         pSC->cExtraPixelsBottom = (U8)val32;
-        JXR_Call(getBit32_SB(pSB, 6, &val32));
+        Call(getBit32_SB(pSB, 6, &val32));
         pSC->cExtraPixelsRight = (U8)val32;
     }
     
     if(((pII->cWidth + pSC->cExtraPixelsLeft + pSC->cExtraPixelsRight) & 0xf) + ((pII->cHeight + pSC->cExtraPixelsTop + pSC->cExtraPixelsBottom) & 0xf) != 0){
-        JXR_FailIf((pII->cWidth & 0xf) + (pII->cHeight & 0xf) + pSC->cExtraPixelsLeft + pSC->cExtraPixelsTop != 0, WMP_errInvalidParameter);
-        JXR_FailIf(pII->cWidth <= pSC->cExtraPixelsRight || pII->cHeight <= pSC->cExtraPixelsBottom, WMP_errInvalidParameter);
+        FailIf((pII->cWidth & 0xf) + (pII->cHeight & 0xf) + pSC->cExtraPixelsLeft + pSC->cExtraPixelsTop != 0, WMP_errInvalidParameter);
+        FailIf(pII->cWidth <= pSC->cExtraPixelsRight || pII->cHeight <= pSC->cExtraPixelsBottom, WMP_errInvalidParameter);
         pII->cWidth -= pSC->cExtraPixelsRight, pII->cHeight -= pSC->cExtraPixelsBottom;
     }
 
     flushToByte_SB(pSB);  // redundant
 
     // read header of first image plane
-    JXR_FailIf(ReadImagePlaneHeader(pII, pSCP, pSC, pSB), WMP_errUnsupportedFormat);
+    FailIf(ReadImagePlaneHeader(pII, pSCP, pSC, pSB), WMP_errUnsupportedFormat);
 
     // maybe UNALIGNED!!!
 
@@ -3431,11 +3431,11 @@ EXTERN_C Int ImageStrDecGetInfo(
     size_t cMarker;
     CCoreParameters aDummy;
     // mark position of start of data
-    JXR_Call(pSCP->pWStream->GetPos(pSCP->pWStream, &cMarker));
-    JXR_Call(ReadWMIHeader(pII, pSCP, &aDummy));
+    Call(pSCP->pWStream->GetPos(pSCP->pWStream, &cMarker));
+    Call(ReadWMIHeader(pII, pSCP, &aDummy));
 
     // rewind to start of data
-    JXR_Call(pSCP->pWStream->SetPos(pSCP->pWStream, cMarker));
+    Call(pSCP->pWStream->SetPos(pSCP->pWStream, cMarker));
     return ICERR_OK;
 
 Cleanup:
@@ -3740,7 +3740,7 @@ Int ImageStrDecInit(
         pNextSC = (CWMImageStrCodec*)pb; pb += sizeof(*pNextSC);
 
         // read plane header of second image plane
-        JXR_Call(attach_SB(&SB, pSCP->pWStream));
+        Call(attach_SB(&SB, pSCP->pWStream));
         InitializeStrDec(pNextSC, &SC.m_param, &SC);
         ReadImagePlaneHeader(&pNextSC->WMII, &pNextSC->WMISCP, &pNextSC->m_param, &SB);
         detach_SB(&SB);
@@ -3784,19 +3784,19 @@ Int ImageStrDecInit(
 
     //================================================
 #ifdef WEB_CLIENT_SUPPORT
-    JXR_FailIf((StrIODecInit(pSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
-    JXR_FailIf((StrDecInit(pSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
+    FailIf((StrIODecInit(pSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
+    FailIf((StrDecInit(pSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
 #else
-    JXR_FailIf((StrIODecInit(pSC) != ICERR_OK), WMP_errOutOfMemory);
-    JXR_FailIf((StrDecInit(pSC) != ICERR_OK), WMP_errOutOfMemory);
+    FailIf((StrIODecInit(pSC) != ICERR_OK), WMP_errOutOfMemory);
+    FailIf((StrDecInit(pSC) != ICERR_OK), WMP_errOutOfMemory);
 #endif
 
     if (pNextSC) {
         // 5. StrEncInit
 #ifdef WEB_CLIENT_SUPPORT
-        JXR_FailIf((StrDecInit(pNextSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
+        FailIf((StrDecInit(pNextSC, failSafe) != ICERR_OK), WMP_errOutOfMemory);
 #else
-        JXR_FailIf((StrDecInit(pNextSC) != ICERR_OK), WMP_errOutOfMemory);
+        FailIf((StrDecInit(pNextSC) != ICERR_OK), WMP_errOutOfMemory);
 #endif
     }
 

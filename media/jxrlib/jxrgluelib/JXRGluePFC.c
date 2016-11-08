@@ -294,8 +294,8 @@ ERR BGR24_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(BGR24_RGB24(pFC, pRect, pb, cbStride));
-    JXR_Call(RGB24_Gray8(pFC, pRect, pb, cbStride));
+    Call(BGR24_RGB24(pFC, pRect, pb, cbStride));
+    Call(RGB24_Gray8(pFC, pRect, pb, cbStride));
 
 Cleanup:
     return err;
@@ -338,7 +338,7 @@ ERR RGB48_BGR48(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
 
     UNREFERENCED_PARAMETER( pFC );
     
-    JXR_Call(PKFormatConverter_Copy(pFC, pRect, pb, cbStride));
+    Call(PKFormatConverter_Copy(pFC, pRect, pb, cbStride));
 
     for (i = 0; i < pRect->Height; ++i)
     {
@@ -372,7 +372,7 @@ ERR RGB48_Gray16(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
  
     UNREFERENCED_PARAMETER( pFC );
    
-    JXR_Call(PKFormatConverter_Copy(pFC, pRect, pb, cbStride));
+    Call(PKFormatConverter_Copy(pFC, pRect, pb, cbStride));
 
     for (i = 0; i < pRect->Height; ++i)
     {
@@ -2721,8 +2721,8 @@ ERR PKFormatConverter_Initialize(PKFormatConverter* pFC, PKImageDecode* pID, cha
     ERR err;
     PKPixelFormatGUID   enPFFrom;
 
-    JXR_Call(pID->GetPixelFormat(pID, &enPFFrom));
-    JXR_Call(PKFormatConverter_InitializeConvert(pFC, enPFFrom, pExt, enPF));
+    Call(pID->GetPixelFormat(pID, &enPFFrom));
+    Call(PKFormatConverter_InitializeConvert(pFC, enPFFrom, pExt, enPF));
 
     pFC->pDecoder = pID;
 
@@ -2779,7 +2779,7 @@ ERR PKFormatConverter_InitializeConvert(PKFormatConverter* pFC, const PKPixelFor
             }
         }
         // If we failed the original check, and this bugfix check, then exit with error
-        JXR_Call(WMP_errUnsupportedFormat);
+        Call(WMP_errUnsupportedFormat);
     }
 
 Cleanup:
@@ -2839,8 +2839,8 @@ ERR PKFormatConverter_Copy(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(pFC->pDecoder->Copy(pFC->pDecoder, pRect, pb, cbStride));
-    JXR_Call(pFC->Convert(pFC, pRect, pb, cbStride));
+    Call(pFC->pDecoder->Copy(pFC->pDecoder, pRect, pb, cbStride));
+    Call(pFC->Convert(pFC, pRect, pb, cbStride));
 
 Cleanup:
     return err;
@@ -2860,7 +2860,7 @@ ERR PKFormatConverter_Release(PKFormatConverter** ppFC)
 {
     ERR err = WMP_errSuccess;
 
-    JXR_Call(PKFree((void **) ppFC));
+    Call(PKFree((void **) ppFC));
 
 Cleanup:
     return err;
@@ -2874,7 +2874,7 @@ ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter)
     ERR err = WMP_errSuccess;
     PKFormatConverter* pFC = NULL;
 
-    JXR_Call(PKAlloc((void **) ppFConverter, sizeof(**ppFConverter)));
+    Call(PKAlloc((void **) ppFConverter, sizeof(**ppFConverter)));
     pFC = *ppFConverter;
 
     pFC->Initialize = PKFormatConverter_Initialize;

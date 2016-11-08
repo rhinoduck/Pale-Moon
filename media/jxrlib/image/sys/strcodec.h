@@ -684,4 +684,4 @@ void flushToByte(BitIOInfo* pIO);
     return 0;
 //    pIO->uiAccumulator = LOAD16(pIO->pbCurrent) & ((U32)(-1) >> pIO->cBitsUsed);
 
-void OutputPerfTimerJXR_Report(CWMImageStrCodec *pState);
+void OutputPerfTimerReport(CWMImageStrCodec *pState);

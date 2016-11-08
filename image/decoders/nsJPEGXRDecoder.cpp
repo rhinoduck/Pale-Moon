@@ -33,18 +33,52 @@
 #include "ImageLogging.h"
 #include "RasterImage.h"
 
-// TODO: Debug; remove!
-#include <cinttypes>
-
 // This is here so that GUIDs coming from JXRGlue.h are also defined in this
-// file and as a result their values are duplicated in xul.dll, because
+// file and that their values are duplicated in xul.dll as a result, because
 // exporting them as symbols from gkmedias.dll would require changes to the
-// library (i.e. the GUIDs would have to be exported as pointers).
+// library (i.e. the GUIDs would have to be exported as pointers). [rhinoduck]
 #ifdef _WIN32
 #include <initguid.h>
 #endif
 
+// Safeguards for when jxrlib meets another piece of code which leaks awful
+// macro names. [rhinoduck]
+#ifdef Failed
+#error A marco with the name 'Failed' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+#ifdef Report
+#error A marco with the name 'Report' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+#ifdef Call
+#error A marco with the name 'Call' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+#ifdef CallIgnoreError
+#error A marco with the name 'CallIgnoreError' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+#ifdef Test
+#error A marco with the name 'Test' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+#ifdef FailIf
+#error A marco with the name 'FailIf' has already been defined, jxrlib would redefine it. One will have to be renamed, or a different solution will have to be found.
+#endif
+
+// This pulls in the awfully named macros. [rhinoduck]
 #include "jxrlib/JXRGlue.h"
+
+// Get rid of the awfully named macros that jxrlib leaks, because otherwise they
+// conflict with function names coming from other includes. [rhinoduck]
+#undef Failed
+#undef Report
+#undef Call
+#undef CallIgnoreError
+#undef Test
+#undef FailIf
+
 #include "nsJPEGXRDecoder.h"
 
 #include "Orientation.h"
@@ -132,22 +166,25 @@ bool nsJPEGXRDecoder::CreateJXRStuff()
 {
     ERR err = WMP_errSuccess;
 
+    // TODO: [rhinoduck] Logging/error reporting.
     // Create a JPEG-XR file decoder
-    JXR_Call(PKImageDecode_Create_WMP(&m_pDecoder));
+    err = PKImageDecode_Create_WMP(&m_pDecoder);
 
+    // TODO: [rhinoduck] Logging/error reporting.
     // Create a pixel format converter
-    JXR_Call(PKCodecFactory_CreateFormatConverter(&m_pConverter));
+    err = PKCodecFactory_CreateFormatConverter(&m_pConverter);
 
     // Some converters will need a pointer to decoder, although they use a bad design - 
     // they (for instance, BlackWhite_Gray8()) assume that main image is being decode, but it could be alpha too.
     // It would be better to have additional properties in the converter itself.
     m_pConverter->pDecoder = m_pDecoder;
 
+    // TODO: [rhinoduck] Logging/error reporting.
     // Create a stream
 #if 0
-    JXR_Call(CreateWS_ChainBuf(&m_pStream, &m_chainBuf));
+    err = CreateWS_ChainBuf(&m_pStream, &m_chainBuf);
 #else
-    JXR_Call(CreateWS_List(&m_pStream));
+    err = CreateWS_List(&m_pStream);
 #endif
 
 Cleanup:
@@ -383,21 +420,7 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
         m_xfPixelFormat = m_outPixelFormat;
     }
 
-    puts("FIRST!");
     err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
-    printf("src: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
-        ((unsigned long *) &srcFmtGUID)[0],
-        ((unsigned long *) &srcFmtGUID)[1],
-        ((unsigned long *) &srcFmtGUID)[2],
-        ((unsigned long *) &srcFmtGUID)[3]
-    );
-    printf("dst: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
-        ((unsigned long *) &outFmt)[0],
-        ((unsigned long *) &outFmt)[1],
-        ((unsigned long *) &outFmt)[2],
-        ((unsigned long *) &outFmt)[3]
-    );
-    puts("FIRST!");
 
     if (WMP_errSuccess != err)
     {
@@ -418,22 +441,8 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
             m_outPixelFormat = pfBGR24;
             break;
         }
-        
-        puts("SECOND!");
+
         err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
-        printf("src: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
-            ((unsigned long *) &srcFmtGUID)[0],
-            ((unsigned long *) &srcFmtGUID)[1],
-            ((unsigned long *) &srcFmtGUID)[2],
-            ((unsigned long *) &srcFmtGUID)[3]
-        );
-        printf("dst: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
-            ((unsigned long *) &outFmt)[0],
-            ((unsigned long *) &outFmt)[1],
-            ((unsigned long *) &outFmt)[2],
-            ((unsigned long *) &outFmt)[3]
-        );
-        puts("SECOND!");
 
         if (WMP_errSuccess != err)
             return;
@@ -547,10 +556,8 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
         srcFmtGUID = GUID_PKPixelFormat16bppGrayHalf;
     else
         return; // format not suported
-    
-    puts("HRNGH!");
+
     err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, GUID_PKPixelFormat8bppGray);
-    puts("HRNGH!");
 
     if (WMP_errSuccess != err)
         return;
@@ -569,7 +576,8 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
     size_t cLinesPerMBRow = MBR_HEIGHT / m_pDecoder->WMP.wmiI.cThumbnailScale;
 
     U8 *pb = NULL;
-    JXR_Call(PKAllocAligned((void **)&pb, cbStride * cLinesPerMBRow, 128));
+    // TODO: [rhinoduck] Logging/error reporting.
+    err = PKAllocAligned((void **)&pb, cbStride * cLinesPerMBRow, 128);
 
     m_alphaBitDepth = cbitUnit;
     m_mbRowBuf = pb;
