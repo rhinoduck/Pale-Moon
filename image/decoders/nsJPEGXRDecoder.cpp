@@ -33,6 +33,17 @@
 #include "ImageLogging.h"
 #include "RasterImage.h"
 
+// TODO: Debug; remove!
+#include <cinttypes>
+
+// This is here so that GUIDs coming from JXRGlue.h are also defined in this
+// file and as a result their values are duplicated in xul.dll, because
+// exporting them as symbols from gkmedias.dll would require changes to the
+// library (i.e. the GUIDs would have to be exported as pointers).
+#ifdef _WIN32
+#include <initguid.h>
+#endif
+
 #include "jxrlib/JXRGlue.h"
 #include "nsJPEGXRDecoder.h"
 
@@ -372,21 +383,21 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
         m_xfPixelFormat = m_outPixelFormat;
     }
 
-    puts("FART!");
+    puts("FIRST!");
     err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
-    printf("GUID: %lX %lX %lX %lX\n",
+    printf("src: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
         ((unsigned long *) &srcFmtGUID)[0],
         ((unsigned long *) &srcFmtGUID)[1],
         ((unsigned long *) &srcFmtGUID)[2],
         ((unsigned long *) &srcFmtGUID)[3]
     );
-    printf("dst: %lX %lX %lX %lX\n",
+    printf("dst: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
         ((unsigned long *) &outFmt)[0],
         ((unsigned long *) &outFmt)[1],
         ((unsigned long *) &outFmt)[2],
         ((unsigned long *) &outFmt)[3]
     );
-    puts("FART!");
+    puts("FIRST!");
 
     if (WMP_errSuccess != err)
     {
@@ -408,21 +419,21 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
             break;
         }
         
-        puts("UGH!");
+        puts("SECOND!");
         err = PKFormatConverter_InitializeConvert(m_pConverter, srcFmtGUID, NULL, outFmt);
-        printf("src: %lX %lX %lX %lX\n",
+        printf("src: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
             ((unsigned long *) &srcFmtGUID)[0],
             ((unsigned long *) &srcFmtGUID)[1],
             ((unsigned long *) &srcFmtGUID)[2],
             ((unsigned long *) &srcFmtGUID)[3]
         );
-        printf("dst: %lX %lX %lX %lX\n",
+        printf("dst: %" PRIx32 " %" PRIx32 " %" PRIx32 " %" PRIx32 "\n",
             ((unsigned long *) &outFmt)[0],
             ((unsigned long *) &outFmt)[1],
             ((unsigned long *) &outFmt)[2],
             ((unsigned long *) &outFmt)[3]
         );
-        puts("UGH!");
+        puts("SECOND!");
 
         if (WMP_errSuccess != err)
             return;

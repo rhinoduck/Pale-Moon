@@ -4,6 +4,21 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+# These are native to Windows but need to be added for other platforms.
+if CONFIG['OS_ARCH'] != 'WINNT':
+    EXPORTS.jxrlib += [
+        'common/include/guiddef.h',
+        'common/include/wmsal.h',
+        'common/include/wmspecstring.h',
+        'common/include/wmspecstrings_adt.h',
+        'common/include/wmspecstrings_strict.h',
+        'common/include/wmspecstrings_undef.h',
+    ]
+
+    LOCAL_INCLUDES += [
+        'common/include',
+    ]
+
 EXPORTS.jxrlib += [
     'image/sys/windowsmediaphoto.h',
     'jxrgluelib/JXRGlue.h',
@@ -11,23 +26,17 @@ EXPORTS.jxrlib += [
 ]
 
 LOCAL_INCLUDES += [
-    'common/include',
     'image/decode',
     'image/sys',
     'image/x86',
     'jxrgluelib',
 ]
 
-# These files cannot be built in unified mode because they want to force NSPR
-# logging.
-# [rhinoduck] Or at least so did the jxr example code say.
 SOURCES += [
     'image/decode/decode.c',
     'image/decode/postprocess.c',
     'image/decode/segdec.c',
     'image/decode/strdec.c',
-    # TODO: [rhinoduck] Why was this file commented out in jxr?
-    # 'decode/strdec_x86.c',
     'image/decode/strInvTransform.c',
     'image/decode/strPredQuantDec.c',
     'image/sys/adapthuff.c',
