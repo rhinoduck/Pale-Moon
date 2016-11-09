@@ -5175,7 +5175,7 @@ dnl ========================================================
 MOZ_JXR=
 
 MOZ_ARG_ENABLE_BOOL(jxr,
-[  --enable-jxr          Enable support for JPEG-XR (JXR) image format (experimental)],
+[  --enable-jxr            Enable support for JPEG-XR (JXR) image format (experimental)],
     MOZ_JXR=1,
     MOZ_JXR=)
 

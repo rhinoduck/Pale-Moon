@@ -29,7 +29,7 @@
 #include "nsJPEGDecoder.h"
 #ifdef MOZ_JXR
 #include "nsJPEGXRDecoder.h"
-#endif MOZ_JXR
+#endif
 #include "nsBMPDecoder.h"
 #include "nsICODecoder.h"
 #include "nsIconDecoder.h"
