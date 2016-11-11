@@ -286,6 +286,10 @@ pref("media.decoder.heuristic.dormant.enabled", true);
 pref("media.decoder.heuristic.dormant.timeout", 60000);
 #endif
 
+#ifdef MOZ_JXR
+pref("media.jxr.enabled", false);
+#endif
+
 #ifdef MOZ_WMF
 pref("media.windows-media-foundation.enabled", true);
 pref("media.windows-media-foundation.use-dxva", true);

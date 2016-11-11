@@ -2689,6 +2689,11 @@ NS_IMETHODIMP nsExternalHelperAppService::GetTypeFromExtension(const nsACString&
   for (size_t i = 0; i < ArrayLength(defaultMimeEntries); i++)
   {
     if (aFileExt.LowerCaseEqualsASCII(defaultMimeEntries[i].mFileExtension)) {
+#ifdef MOZ_JXR
+      if (!Preferences::GetBool("media.jxr.enabled")
+        && defaultMimeEntries[i].mMimeType == IMAGE_JPEG_XR)
+          return NS_ERROR_NOT_AVAILABLE;
+#endif
       aContentType = defaultMimeEntries[i].mMimeType;
       return rv;
     }

@@ -8,6 +8,7 @@
 #include "Image.h"
 #include "nsRefreshDriver.h"
 #include "mozilla/TimeStamp.h"
+#include "mozilla/Preferences.h"
 
 namespace mozilla {
 namespace image {

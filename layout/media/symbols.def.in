@@ -252,7 +252,7 @@ jpeg_abort
 jpeg_abort_decompress
 jpeg_read_raw_data
 #endif
-#if defined (MOZ_JXR) && !defined(MOZ_NATIVE_JXR)
+#if defined(MOZ_JXR) && !defined(MOZ_NATIVE_JXR)
 ImageStrDecGetInfo
 CalcThumbnailSize
 GetIndexTable

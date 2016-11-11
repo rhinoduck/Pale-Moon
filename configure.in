@@ -5175,9 +5175,9 @@ dnl ========================================================
 MOZ_JXR=
 
 MOZ_ARG_ENABLE_BOOL(jxr,
-[  --enable-jxr            Enable support for JPEG-XR (JXR) image format (experimental)],
-    MOZ_JXR=1,
-    MOZ_JXR=)
+[  --disable-jxr            Disable support for JPEG-XR (JXR) image format],
+    MOZ_JXR=,
+    MOZ_JXR=1)
 
 if test -n "$MOZ_JXR"; then
     AC_DEFINE(MOZ_JXR)
@@ -5205,9 +5205,13 @@ fi
 if test -z "$JXR_DIR" -o "$JXR_DIR" = "no"; then
     MOZ_NATIVE_JXR=
 else
-    AC_CHECK_LIB(jxr, PKImageDecode_Create_WMP,
-        [MOZ_NATIVE_JXR=1 MOZ_JXR_LIBS="-ljxr"],
-        [MOZ_NATIVE_JXR= MOZ_JXR_CFLAGS= MOZ_JXR_LIBS=])
+    AC_CHECK_LIB(jxrglue, PKImageDecode_Create_WMP)
+dnl    AC_CHECK_LIB(jxrglue, PKImageDecode_Create_WMP,
+dnl        [MOZ_NATIVE_JXR=1 MOZ_JXR_LIBS="-ljxrglue"],
+dnl        [MOZ_NATIVE_JXR= MOZ_JXR_CFLAGS= MOZ_JXR_LIBS=])
+dnl    AC_CHECK_LIB(jpegxr, ImageStrDecDecode,
+dnl        [MOZ_NATIVE_JXR=1 MOZ_JXR_LIBS="-ljxrglue"],
+dnl        [MOZ_NATIVE_JXR= MOZ_JXR_CFLAGS= MOZ_JXR_LIBS=])
 fi
 CFLAGS=$_SAVE_CFLAGS
 LDFLAGS=$_SAVE_LDFLAGS
