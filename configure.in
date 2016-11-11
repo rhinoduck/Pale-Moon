@@ -5224,7 +5224,7 @@ if test -n "$JXR_DIR" -a "$JXR_DIR" != "no"; then
 
         if test -n "${JXR_DIR}" -a "$JXR_DIR" != "yes"; then
             MOZ_JXR_CFLAGS="-I${JXR_DIR}/include"
-        MOZ_JXR_LIBS="-L${JXR_DIR}/lib ${MOZ_JXR_LIBS}"
+            MOZ_JXR_LIBS="-L${JXR_DIR}/lib ${MOZ_JXR_LIBS}"
 
             CFLAGS=$_SAVE_CFLAGS
             LDFLAGS=$_SAVE_LDFLAGS
@@ -5232,6 +5232,8 @@ if test -n "$JXR_DIR" -a "$JXR_DIR" != "no"; then
         else
             MOZ_CHECK_HEADER(jxrlib/windowsmediaphoto.h, [],
                 [AC_MSG_ERROR([windowsmediaphoto.h is missing from the jxrlib package on your system, you will have to provide it yourself (this is a known issue on Ubuntu Trusty for example)])])
+               # TODO: Test!
+            MOZ_JXR_CFLAGS=-I/usr/include/jxrlib
         fi
 
         MOZ_NATIVE_JXR=1
