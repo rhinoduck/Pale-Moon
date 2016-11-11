@@ -5218,7 +5218,7 @@ else
         [HAVE_JPEGXR=1],
         [HAVE_JPEGXR=])
 
-    if test -z HAVE_JXRGLUE -o -z HAVE_JPEGXR; then
+    if test -z "$HAVE_JXRGLUE" -o -z "$HAVE_JPEGXR"; then
         AC_MSG_ERROR([libjxrglue and libjpegxr are required if you want to compile with system jxrlib])
     fi
 
