@@ -6,7 +6,7 @@
 
 # These are native to Windows but need to be added for other platforms.
 if CONFIG['OS_ARCH'] != 'WINNT':
-    EXPORTS.jxrlib += [
+    EXPORTS += [
         'common/include/guiddef.h',
         'common/include/wmsal.h',
         'common/include/wmspecstring.h',
