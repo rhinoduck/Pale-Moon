@@ -5219,7 +5219,7 @@ if test -n "$JXR_DIR" -a "$JXR_DIR" != "no"; then
             [HAVE_JPEGXR=])
 
             if test -z "$HAVE_JXRGLUE" -o -z "$HAVE_JPEGXR"; then
-            AC_MSG_ERROR([libjxrglue and libjpegxr are required if you want to compile with system jxrlib, try installing the libjxr0-dev package or similar])
+            AC_MSG_ERROR([libjxrglue and libjpegxr are required if you want to compile with system jxrlib, try installing the libjxr-dev package or similar])
         fi
 
         if test -n "${JXR_DIR}" -a "$JXR_DIR" != "yes"; then
