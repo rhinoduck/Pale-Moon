@@ -5175,7 +5175,7 @@ dnl ========================================================
 MOZ_JXR=
 
 MOZ_ARG_ENABLE_BOOL(jxr,
-[  --disable-jxr            Disable support for JPEG-XR (JXR) image format],
+[  --disable-jxr           Disable support for JPEG-XR (JXR) image format],
     MOZ_JXR=,
     MOZ_JXR=1)
 
@@ -5198,6 +5198,8 @@ MOZ_ARG_WITH_STRING(system-jxr,
 if test -z "$JXR_DIR" -o "$JXR_DIR" = "no"; then
     MOZ_NATIVE_JXR=
 else
+    AC_MSG_CHECKING([for system jxrlib])
+
     MOZ_JXR_LIBS="-ljxrglue -ljpegxr"
 
     _SAVE_CFLAGS=$CFLAGS
@@ -5210,10 +5212,10 @@ else
     fi
 
     AC_CHECK_LIB(jxrglue, PKImageDecode_Create_WMP,
-        [HAVE_JXRGLUE=1]
+        [HAVE_JXRGLUE=1],
         [HAVE_JXRGLUE=])
     AC_CHECK_LIB(jpegxr, ImageStrDecDecode,
-        [HAVE_JPEGXR=1]
+        [HAVE_JPEGXR=1],
         [HAVE_JPEGXR=])
 
     if test -z HAVE_JXRGLUE -o -z HAVE_JPEGXR; then
