@@ -41,7 +41,7 @@ if not CONFIG['MOZ_NATIVE_PNG']:
 if not CONFIG['MOZ_NATIVE_WEBP']:
     external_dirs += ['media/libwebp']
 
-if CONFIG['MOZ_JXR'] and not CONFIG['MOZ_NATIVE_JXR']:
+if CONFIG['MOZ_JXR']:
     external_dirs += ['media/jxrlib']
 
 external_dirs += [

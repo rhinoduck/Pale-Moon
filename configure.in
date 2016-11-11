@@ -5185,64 +5185,6 @@ fi
 AC_SUBST(MOZ_JXR)
 
 dnl ========================================================
-dnl system JPEG-XR (JXR) support
-dnl ========================================================
-MOZ_NATIVE_JXR=
-
-MOZ_ARG_WITH_STRING(system-jxr,
-[  --with-system-jxr[=PFX]
-                          Use system libjxr [installed at prefix PFX]],
-    JXR_DIR=$withval)
-
-if test -n "$JXR_DIR" -a "$JXR_DIR" != "no"; then
-    if test -z "$MOZ_JXR"; then
-        AC_MSG_WARN([system jxrlib libary will not be linked because jxr support is not enabled])
-    else
-        AC_MSG_CHECKING([for system jxrlib])
-
-        MOZ_JXR_LIBS="-ljxrglue -ljpegxr"
-
-        if test -n "$JXR_DIR" -a "$JXR_DIR" != "yes"; then
-            _SAVE_CFLAGS=$CFLAGS
-            _SAVE_LDFLAGS=$LDFLAGS
-            _SAVE_LIBS=$LIBS
-
-            CFLAGS="-I${JXR_DIR}/include $CFLAGS"
-            LDFLAGS="-L${JXR_DIR}/lib $LDFLAGS"
-        fi
-
-        AC_CHECK_LIB(jxrglue, PKImageDecode_Create_WMP,
-            [HAVE_JXRGLUE=1],
-            [HAVE_JXRGLUE=])
-        AC_CHECK_LIB(jpegxr, ImageStrDecDecode,
-            [HAVE_JPEGXR=1],
-            [HAVE_JPEGXR=])
-
-            if test -z "$HAVE_JXRGLUE" -o -z "$HAVE_JPEGXR"; then
-            AC_MSG_ERROR([libjxrglue and libjpegxr are required if you want to compile with system jxrlib, try installing the libjxr-dev package or similar])
-        fi
-
-        if test -n "${JXR_DIR}" -a "$JXR_DIR" != "yes"; then
-            MOZ_JXR_CFLAGS="-I${JXR_DIR}/include"
-            MOZ_JXR_LIBS="-L${JXR_DIR}/lib ${MOZ_JXR_LIBS}"
-
-            CFLAGS=$_SAVE_CFLAGS
-            LDFLAGS=$_SAVE_LDFLAGS
-            LIBS=$_SAVE_LIBS
-        else
-            MOZ_CHECK_HEADER(jxrlib/windowsmediaphoto.h, [],
-                [AC_MSG_ERROR([windowsmediaphoto.h is missing from the jxrlib package on your system, you will have to provide it yourself (this is a known issue on Ubuntu Trusty for example)])])
-               # TODO: Test!
-            MOZ_JXR_CFLAGS=-I/usr/include/jxrlib
-        fi
-
-        MOZ_NATIVE_JXR=1
-    fi
-fi
-
-AC_SUBST(MOZ_NATIVE_JXR)
-
-dnl ========================================================
 dnl = Enable Raw Codecs
 dnl ========================================================
 MOZ_ARG_ENABLE_BOOL(raw,
