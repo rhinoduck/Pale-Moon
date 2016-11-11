@@ -5222,11 +5222,15 @@ else
         AC_MSG_ERROR([libjxrglue and libjpegxr are required if you want to compile with system jxrlib])
     fi
 
-    MOZ_NATIVE_JXR=1
     if test -n "${JXR_DIR}"; then
         MOZ_JXR_CFLAGS="-I${JXR_DIR}/include"
         MOZ_JXR_LIBS="-L${JXR_DIR}/lib ${MOZ_JXR_LIBS}"
+    else
+        MOZ_CHECK_HEADER(jxrlib/sys/windowsmediaphoto.h, [],
+            [AC_MSG_ERROR([windowsmediaphoto.h is missing from your jxrlib package, you will have to provide it yourself (this is a known issue on Ubuntu Trusty for example)])])
     fi
+
+    MOZ_NATIVE_JXR=1
 
     CFLAGS=$_SAVE_CFLAGS
     LDFLAGS=$_SAVE_LDFLAGS
