@@ -2343,9 +2343,18 @@ void nsJPEGXRDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
         // Workaround for wrong image byte count in the header. This can take place in old images created with a
         // buggy version of JXRLib
         if (GetTotalNumBytesReceived() < m_pDecoder->WMP.wmiDEMisc.uImageOffset + m_pDecoder->WMP.wmiDEMisc.uImageByteCount)
-            FixWrongImageSizeTag(GetTotalNumBytesReceived());
+        {
+            // Let's not do this, or bad things will happen when we receive
+            // incomplete data. [rhinoduck]
+            //FixWrongImageSizeTag(GetTotalNumBytesReceived());
+
+            // For now, let's just raise an error instead. [rhinoduck]
+            PostDataError();
+            return;
+        }
         else
             return;
+
     }
     else
         Receive((const unsigned char *)aBuffer, aCount);
@@ -2541,7 +2550,15 @@ void nsJPEGXRDecoder::FinishInternal()
                 // Circumvent the bug in JXELIB's JPEG-XR encoder that writes wrong alpha plane byte count.
                 // Adjust the alpha plane byte count if the value is wrong.
                 if (m_pDecoder->WMP.wmiDEMisc.uAlphaOffset + m_pDecoder->WMP.wmiI_Alpha.uImageByteCount > GetTotalNumBytesReceived())
-                    m_pDecoder->WMP.wmiI_Alpha.uImageByteCount = GetTotalNumBytesReceived() - m_pDecoder->WMP.wmiDEMisc.uAlphaOffset;
+                {
+                    // Let's not do this, or bad things will happen when we
+                    // receive incomplete data. [rhinoduck]
+                    //m_pDecoder->WMP.wmiI_Alpha.uImageByteCount = GetTotalNumBytesReceived() - m_pDecoder->WMP.wmiDEMisc.uAlphaOffset;
+
+                    // For now, let's just raise an error instead. [rhinoduck]
+                    PostDataError();
+                    return;
+                }
 
                 StartDecodingMBRows_Alpha();
                 DecodeAllMBRowsWithAlpha();
@@ -2564,8 +2581,14 @@ void nsJPEGXRDecoder::FinishInternal()
                 // buggy version of JXRLib
                 if (GetTotalNumBytesReceived() < m_pDecoder->WMP.wmiDEMisc.uImageOffset + m_pDecoder->WMP.wmiDEMisc.uImageByteCount)
                 {
-                    FixWrongImageSizeTag(GetTotalNumBytesReceived());
-                    DoTheDecoding();
+                    // Let's not do this, or bad things will happen when we
+                    // receive incomplete data. [rhinoduck]
+                    //FixWrongImageSizeTag(GetTotalNumBytesReceived());
+                    //DoTheDecoding();
+
+                    // For now, let's just raise an error instead. [rhinoduck]
+                    PostDataError();
+                    return;
                 }
             }
 
@@ -2580,7 +2603,15 @@ void nsJPEGXRDecoder::FinishInternal()
                 // Circumvent the bug in JXELIB's JPEG-XR encoder that writes wrong alpha plane byte count.
                 // Adjust the alpha plane byte count if the value is wrong.
                 if (m_pDecoder->WMP.wmiDEMisc.uAlphaOffset + m_pDecoder->WMP.wmiI_Alpha.uImageByteCount > GetTotalNumBytesReceived())
-                    m_pDecoder->WMP.wmiI_Alpha.uImageByteCount = GetTotalNumBytesReceived() - m_pDecoder->WMP.wmiDEMisc.uAlphaOffset;
+                {
+                    // Let's not do this, or bad things will happen when we
+                    // receive incomplete data. [rhinoduck]
+                    //m_pDecoder->WMP.wmiI_Alpha.uImageByteCount = GetTotalNumBytesReceived() - m_pDecoder->WMP.wmiDEMisc.uAlphaOffset;
+
+                    // For now, let's just raise an error instead. [rhinoduck]
+                    PostDataError();
+                    return;
+                }
 
                 StartDecodingMBRows_Alpha();
                 SetCurrentSubbandUpperLimit(m_pDecoder->WMP.ctxSC, 0);
