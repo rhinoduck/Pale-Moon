@@ -169,10 +169,16 @@ bool nsJPEGXRDecoder::CreateJXRStuff()
     // TODO: [rhinoduck] Logging/error reporting.
     // Create a JPEG-XR file decoder
     err = PKImageDecode_Create_WMP(&m_pDecoder);
+    if (err != WMP_errSuccess) {
+      goto Cleanup;
+    }
 
     // TODO: [rhinoduck] Logging/error reporting.
     // Create a pixel format converter
     err = PKCodecFactory_CreateFormatConverter(&m_pConverter);
+    if (err != WMP_errSuccess) {
+      goto Cleanup;
+    }
 
     // Some converters will need a pointer to decoder, although they use a bad design -
     // they (for instance, BlackWhite_Gray8()) assume that main image is being decode, but it could be alpha too.
@@ -183,8 +189,14 @@ bool nsJPEGXRDecoder::CreateJXRStuff()
     // Create a stream
 #if 0
     err = CreateWS_ChainBuf(&m_pStream, &m_chainBuf);
+    if (err != WMP_errSuccess) {
+      goto Cleanup;
+    }
 #else
     err = CreateWS_List(&m_pStream);
+    if (err != WMP_errSuccess) {
+      goto Cleanup;
+    }
 #endif
 
 Cleanup:
@@ -578,6 +590,9 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
     U8 *pb = NULL;
     // TODO: [rhinoduck] Logging/error reporting.
     err = PKAllocAligned((void **)&pb, cbStride * cLinesPerMBRow, 128);
+    if (err != WMP_errSuccess) {
+      goto Cleanup;
+    }
 
     m_alphaBitDepth = cbitUnit;
     m_mbRowBuf = pb;
