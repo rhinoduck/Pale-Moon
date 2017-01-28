@@ -2370,6 +2370,14 @@ void nsJPEGXRDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
         if (!DecoderInitialized())
             return;
 
+        // The browser needs to know whether the image has an alpha channel
+        // before it is fed any data so that it can render it properly. This
+        // fixes transparent areas appearing as black in some images.
+        // [rhinoduck]
+        if (HasAlpha()) {
+          PostHasTransparency();
+        }
+
         size_t width, height;
         //GetSize(width, height);
         GetThumbnailSize(width, height);
