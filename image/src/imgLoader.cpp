@@ -2522,7 +2522,7 @@ void imgLoader::UpdateJPEGXRAcceptHeader(bool enabled)
       return;
     }
 
-    // Try inserting after the WebP MIME type to have a cannonical header if
+    // Try inserting after the WebP MIME type to have a canonical header if
     // possible. If this fails, the JPEG XR MIME type will be "aggressively"
     // inserted at the beginning.
     FindMIMETypeInAcceptHeader("image/webp", start, end, &subStart, &subEnd);
