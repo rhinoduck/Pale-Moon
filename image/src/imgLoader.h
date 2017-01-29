@@ -397,7 +397,7 @@ private: // methods
   void CheckCacheLimits(imgCacheTable &cache, imgCacheQueue &queue);
 
 #ifdef MOZ_JXR
-  static void UpdateJPEGXRAcceptHeader(bool enabled);
+  void UpdateJPEGXRAcceptHeader(bool enabled);
   static void FindMIMETypeInAcceptHeader(const char* mimeType, char* start,
       char* end, char** subStart, char** subEnd);
 #endif
@@ -430,6 +430,10 @@ private: // data
 
   nsAutoPtr<imgCacheExpirationTracker> mCacheTracker;
   bool mRespectPrivacy;
+
+#ifdef MOZ_JXR
+  nsCString mLastJxrMimeType;
+#endif
 };
 
 

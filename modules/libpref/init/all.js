@@ -293,16 +293,14 @@ pref("media.jxr.enabled", false);
 // for image requests. Leave this as 'true' for conditional JXR serving to work;
 // set this to 'false' if you don't want it meddling with the Accept field in
 // your HTTP headers for privacy or whatever other reasons.
-// NOTE: Set "media.jxr.enabled" to 'false' before changing this preference or
-//       check that "image.http.accept" contains what you want it to contain
-//       after.
+// NOTE: If you set this to 'false', it will be your responsibility to
+//       make/revert any changes to "http.image.accept".
 pref("media.jxr.autoaccept", true);
 // The MIME type that should be advertised in the Accept field of image HTTP
-// requets; the two choices are "image/jxr" and "image/vnd.ms-photo". This is
-// mainly for testing and should be removed once the preferred type (most likely
-// "image/jxr") has been chosen.
-// NOTE: Set "media.jxr.enabled" to 'false' before changing this preference if
-//       you rely on "image.http.accept" being autoupdated.
+// requets; the two choices are "image/jxr" and "image/vnd.ms-photo". If
+// "media.jxr.autoaccept" is 'true', "http.image.accept" will be automatically
+// updated with the new type. This pref is mainly for testing and should be
+// removed once the preferred type (most likely "image/jxr") has been chosen.
 pref("media.jxr.advertised_mime_type", "image/jxr");
 #endif
 #ifdef MOZ_DIRECTSHOW

@@ -1147,10 +1147,22 @@ nsresult imgLoader::Init()
   InitCache();
 
 #ifdef MOZ_JXR
+  nsAdoptingCString advertisedJxrMimeType = Preferences::GetCString(
+      "media.jxr.advertised_mime_type");
+  if (!advertisedJxrMimeType) {
+    mLastJxrMimeType = "";
+  } else {
+    advertisedJxrMimeType.Trim(" \t\n\v\f\r");
+    mLastJxrMimeType = advertisedJxrMimeType;
+  }
+
   if (Preferences::GetBool("media.jxr.autoaccept", false)) {
     UpdateJPEGXRAcceptHeader(Preferences::GetBool("media.jxr.enabled", false));
   }
+
   Preferences::AddWeakObserver(this, "media.jxr.enabled");
+  Preferences::AddWeakObserver(this, "media.jxr.advertised_mime_type");
+  Preferences::AddWeakObserver(this, "media.jxr.autoaccept");
 #endif
 
   ReadAcceptHeaderPref();
@@ -1181,6 +1193,12 @@ imgLoader::Observe(nsISupports* aSubject, const char* aTopic, const char16_t* aD
       if (Preferences::GetBool("media.jxr.autoaccept", false)) {
         UpdateJPEGXRAcceptHeader(Preferences::GetBool("media.jxr.enabled",
             false));
+      }
+    } else if (!NS_strcmp(aData, MOZ_UTF16("media.jxr.advertised_mime_type"))) {
+      if (Preferences::GetBool("media.jxr.enabled", false) &&
+          Preferences::GetBool("media.jxr.autoaccept", false)) {
+        UpdateJPEGXRAcceptHeader(false);
+        UpdateJPEGXRAcceptHeader(true);
       }
     }
 #endif
@@ -2499,12 +2517,6 @@ void imgLoader::FindMIMETypeInAcceptHeader(const char* mimeType, char* start,
 // Adds/removes the JPEG XR MIME type to/from the "image.http.accept" pref.
 void imgLoader::UpdateJPEGXRAcceptHeader(bool enabled)
 {
-  nsAdoptingCString jxrMimeType = Preferences::GetCString(
-      "media.jxr.advertised_mime_type");
-  if (!jxrMimeType) {
-    return;
-  }
-
   nsAdoptingCString accept = Preferences::GetCString("image.http.accept");
   if (!accept) {
     return;
@@ -2515,10 +2527,25 @@ void imgLoader::UpdateJPEGXRAcceptHeader(bool enabled)
   char* subStart = NULL;
   char* subEnd = NULL;
 
-  FindMIMETypeInAcceptHeader(jxrMimeType.get(), start, end, &subStart, &subEnd);
+  nsAdoptingCString jxrMimeType = Preferences::GetCString(
+      "media.jxr.advertised_mime_type");
 
-  if (enabled) {
+  if (enabled) { // Adding the MIME type.
+    if (!jxrMimeType) {
+      return;
+    }
+
+    jxrMimeType.Trim(" \t\n\v\f\r");
+    if (jxrMimeType.IsEmpty()) {
+      return;
+    }
+    mLastJxrMimeType = jxrMimeType;
+
+    FindMIMETypeInAcceptHeader(jxrMimeType.get(), start, end,
+        &subStart, &subEnd);
+
     if (subEnd) {
+      // MIME type already present.
       return;
     }
 
@@ -2544,7 +2571,14 @@ void imgLoader::UpdateJPEGXRAcceptHeader(bool enabled)
         accept.Insert(jxrMimeType + NS_LITERAL_CSTRING(","), 0);
       }
     }
-  } else {
+  } else { // Removing the MIME type.
+    if (mLastJxrMimeType.IsEmpty()) {
+      return;
+    }
+
+    FindMIMETypeInAcceptHeader(mLastJxrMimeType.get(), start, end,
+        &subStart, &subEnd);
+
     if (!subEnd) {
       return;
     }
