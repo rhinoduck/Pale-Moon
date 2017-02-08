@@ -397,7 +397,7 @@ private: // methods
   void CheckCacheLimits(imgCacheTable &cache, imgCacheQueue &queue);
 
 #ifdef MOZ_JXR
-  void UpdateJPEGXRAcceptHeader(bool enabled);
+  void UpdateJXRAcceptHeader(bool enabled);
   static void FindMIMETypeInAcceptHeader(const char* mimeType, char* start,
       char* end, char** subStart, char** subEnd);
 #endif

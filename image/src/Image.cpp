@@ -51,12 +51,12 @@ Image::GetDecoderType(const char *aMimeType)
     rv = eDecoderType_jpeg;
 
 #ifdef MOZ_JXR
-  // JPEG-XR
+  // JXR (JPEG XR)
   else if (
-      !strcmp(aMimeType, IMAGE_JPEG_XR) || !strcmp(aMimeType, IMAGE_MS_PHOTO)
+      !strcmp(aMimeType, IMAGE_JXR) || !strcmp(aMimeType, IMAGE_MS_PHOTO)
   ) {
     if (gfxPrefs::MediaJXREnabled()) {
-      rv = eDecoderType_jpeg_xr;
+      rv = eDecoderType_jxr;
     }
   }
 #endif

@@ -70,7 +70,7 @@ static const mozilla::Module::CategoryEntry kImageCategories[] = {
   { "Goanna-Content-Viewers", IMAGE_GIF, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_JPEG, "@mozilla.org/content/document-loader-factory;1" },
 #ifdef MOZ_JXR
-  { "Goanna-Content-Viewers", IMAGE_JPEG_XR, "@mozilla.org/content/document-loader-factory;1" },
+  { "Goanna-Content-Viewers", IMAGE_JXR, "@mozilla.org/content/document-loader-factory;1" },
   { "Goanna-Content-Viewers", IMAGE_MS_PHOTO, "@mozilla.org/content/document-loader-factory;1" },
 #endif
   { "Goanna-Content-Viewers", IMAGE_PJPEG, "@mozilla.org/content/document-loader-factory;1" },

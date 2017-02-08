@@ -38,7 +38,7 @@ SOURCES += [
 ]
 
 if CONFIG['MOZ_JXR']:
-    SOURCES += ['nsJPEGXRDecoder.cpp']
+    SOURCES += ['nsJXRDecoder.cpp']
 
 FAIL_ON_WARNINGS = True
 

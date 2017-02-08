@@ -79,7 +79,7 @@
 #undef Test
 #undef FailIf
 
-#include "nsJPEGXRDecoder.h"
+#include "nsJXRDecoder.h"
 
 #include "Orientation.h"
 
@@ -98,14 +98,14 @@ namespace image {
 
 //#ifdef PR_LOGGING
 //static PRLogModuleInfo *
-//GetJPEGXRLog()
+//GetJXRLog()
 //{
-//  static PRLogModuleInfo *sJPEGXRLog;
+//  static PRLogModuleInfo *sJXRLog;
 //
-//  if (!sJPEGXRLog)
-//    sJPEGXRLog = PR_NewLogModule("JPEGXRDecoder");
+//  if (!sJXRLog)
+//    sJXRLog = PR_NewLogModule("JXRDecoder");
 //
-//  return sJPEGXRLog;
+//  return sJXRLog;
 //}
 //#endif
 
@@ -126,7 +126,7 @@ namespace image {
 // It would be nice to have a way to know for sure that the image is taken from the browser's cache. In this case,
 // one would not have to do progressive decoding (in case of frequency mode) or fail-safe row-by-row decoding (in case of spatial mode)
 // which are both rather expensive (fail-safe decoding does a lot of memory copying to save and restore coding contexts).
-nsJPEGXRDecoder::nsJPEGXRDecoder(RasterImage* aImage, bool hasBeenDecoded) : Decoder(aImage),
+nsJXRDecoder::nsJXRDecoder(RasterImage* aImage, bool hasBeenDecoded) : Decoder(aImage),
     m_decodeAtEnd(hasBeenDecoded),
     m_totalReceived(0),
     m_pDecoder(nullptr), m_pConverter(nullptr), m_pStream(nullptr),
@@ -147,7 +147,7 @@ nsJPEGXRDecoder::nsJPEGXRDecoder(RasterImage* aImage, bool hasBeenDecoded) : Dec
 #endif
 }
 
-nsJPEGXRDecoder::~nsJPEGXRDecoder()
+nsJXRDecoder::~nsJXRDecoder()
 {
     DestroyJXRStuff();
     moz_free(m_tileRowBandInfos);
@@ -162,7 +162,7 @@ nsJPEGXRDecoder::~nsJPEGXRDecoder()
     moz_free(m_xfBuf);
 }
 
-bool nsJPEGXRDecoder::CreateJXRStuff()
+bool nsJXRDecoder::CreateJXRStuff()
 {
     ERR err = WMP_errSuccess;
 
@@ -207,7 +207,7 @@ Cleanup:
     return true;
 }
 
-void nsJPEGXRDecoder::DestroyJXRStuff()
+void nsJXRDecoder::DestroyJXRStuff()
 {
     if (nullptr != m_pDecoder)
         m_pDecoder->Release(&m_pDecoder);
@@ -221,7 +221,7 @@ void nsJPEGXRDecoder::DestroyJXRStuff()
     m_decoderInitialized = false;
 }
 
-void nsJPEGXRDecoder::InitializeJXRDecoder()
+void nsJXRDecoder::InitializeJXRDecoder()
 {
     if (DecoderInitialized())
         return;
@@ -229,7 +229,7 @@ void nsJPEGXRDecoder::InitializeJXRDecoder()
     m_decoderInitialized = WMP_errSuccess == m_pDecoder->Initialize(m_pDecoder, m_pStream);
 }
 
-bool nsJPEGXRDecoder::HasAlpha() const
+bool nsJXRDecoder::HasAlpha() const
 {
     PKPixelInfo PI;
     PI.pGUIDPixFmt = &m_pDecoder->guidPixFormat;
@@ -242,12 +242,12 @@ bool nsJPEGXRDecoder::HasAlpha() const
     return hasAlpha;
 }
 
-bool nsJPEGXRDecoder::HasPlanarAlpha() const
+bool nsJXRDecoder::HasPlanarAlpha() const
 {
     return m_pDecoder->WMP.bHasAlpha != 0;
 }
 
-bool nsJPEGXRDecoder::GetSize(size_t &width, size_t &height)
+bool nsJXRDecoder::GetSize(size_t &width, size_t &height)
 {
     if (nullptr == m_pDecoder)
     {
@@ -268,7 +268,7 @@ bool nsJPEGXRDecoder::GetSize(size_t &width, size_t &height)
     return true;
 }
 
-bool nsJPEGXRDecoder::GetThumbnailSize(size_t &width, size_t &height)
+bool nsJXRDecoder::GetThumbnailSize(size_t &width, size_t &height)
 {
     if (nullptr == m_pDecoder)
     {
@@ -291,17 +291,17 @@ bool nsJPEGXRDecoder::GetThumbnailSize(size_t &width, size_t &height)
     return true;
 }
 
-size_t nsJPEGXRDecoder::GetNumTileRows() const
+size_t nsJXRDecoder::GetNumTileRows() const
 {
     return nullptr == m_pDecoder ? 0 : m_pDecoder->WMP.wmiSCP.cNumOfSliceMinus1H + 1;
 }
 
-size_t nsJPEGXRDecoder::GetNumTileCols() const
+size_t nsJXRDecoder::GetNumTileCols() const
 {
     return nullptr == m_pDecoder ? 0 : m_pDecoder->WMP.wmiSCP.cNumOfSliceMinus1V + 1;
 }
 
-bool nsJPEGXRDecoder::Receive(const uint8_t *buf, uint32_t count)
+bool nsJXRDecoder::Receive(const uint8_t *buf, uint32_t count)
 {
     WMPStream *pWS = m_pStream;
     pWS->SetPos(pWS, GetTotalNumBytesReceived());
@@ -311,7 +311,7 @@ bool nsJPEGXRDecoder::Receive(const uint8_t *buf, uint32_t count)
     return true;
 }
 
-uint32_t nsJPEGXRDecoder::GetPixFmtBitsPP(PixelFormat pixFmt)
+uint32_t nsJXRDecoder::GetPixFmtBitsPP(PixelFormat pixFmt)
 {
     switch (pixFmt)
     {
@@ -345,7 +345,7 @@ uint32_t nsJPEGXRDecoder::GetPixFmtBitsPP(PixelFormat pixFmt)
 }
 
 // Allocate raster buffer for the decoding of macroblock rows
-void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
+void nsJXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
 {
     if (nullptr != m_mbRowBuf)
         FreeMBRowBuffers();
@@ -502,7 +502,7 @@ void nsJPEGXRDecoder::AllocateMBRowBuffer(size_t width, bool decodeAlpha)
     }
 }
 
-void nsJPEGXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
+void nsJXRDecoder::AllocateMBRowBuffer_Alpha(size_t width)
 {
     if (nullptr != m_mbRowBuf)
         FreeMBRowBuffers();
@@ -603,7 +603,7 @@ Cleanup:
 }
 
 // Main image plane only
-bool nsJPEGXRDecoder::FillTileRowBandInfo()
+bool nsJXRDecoder::FillTileRowBandInfo()
 {
     if (!m_pDecoder->WMP.wmiSCP.bProgressiveMode)
         return false;
@@ -783,7 +783,7 @@ bool nsJPEGXRDecoder::FillTileRowBandInfo()
     return true;
 }
 
-bool nsJPEGXRDecoder::FillTileRowInfo()
+bool nsJXRDecoder::FillTileRowInfo()
 {
     if (m_pDecoder->WMP.wmiSCP.bProgressiveMode)
         return false;
@@ -919,7 +919,7 @@ bool nsJPEGXRDecoder::FillTileRowInfo()
     return true;
 }
 
-size_t nsJPEGXRDecoder::GetTileRowForMBRow(size_t mbRow)
+size_t nsJXRDecoder::GetTileRowForMBRow(size_t mbRow)
 {
     if (nullptr == m_tileRowInfos)
         return 0;
@@ -940,7 +940,7 @@ size_t nsJPEGXRDecoder::GetTileRowForMBRow(size_t mbRow)
 }
 
 // Number of subbands that can be decoded with the number of bytes received (in progressive layout)
-size_t nsJPEGXRDecoder::GetNumberOfCoveredSubBands()
+size_t nsJXRDecoder::GetNumberOfCoveredSubBands()
 {
     size_t result = 0;
 
@@ -958,7 +958,7 @@ size_t nsJPEGXRDecoder::GetNumberOfCoveredSubBands()
     return result;
 }
 
-bool nsJPEGXRDecoder::HasEmptyTileRowSubbands(size_t subband)
+bool nsJXRDecoder::HasEmptyTileRowSubbands(size_t subband)
 {
     for (size_t i = 0; i < GetNumTileRows(); ++i)
     {
@@ -971,7 +971,7 @@ bool nsJPEGXRDecoder::HasEmptyTileRowSubbands(size_t subband)
     return false;
 }
 
-void nsJPEGXRDecoder::StartDecodingNextSubband()
+void nsJXRDecoder::StartDecodingNextSubband()
 {
     if (!StartedDecodingMBRows())
         return;
@@ -1007,7 +1007,7 @@ void nsJPEGXRDecoder::StartDecodingNextSubband()
     m_startedDecodingSubband = true;
 }
 
-void nsJPEGXRDecoder::EndDecodingCurrentSubband()
+void nsJXRDecoder::EndDecodingCurrentSubband()
 {
     if (!StartedDecodingMBRows() || !StartedDecodingSubband())
         return;
@@ -1019,7 +1019,7 @@ void nsJPEGXRDecoder::EndDecodingCurrentSubband()
 
 ///////////>
 
-void nsJPEGXRDecoder::UpdateImage(size_t top, size_t width, size_t height)
+void nsJXRDecoder::UpdateImage(size_t top, size_t width, size_t height)
 {
     uint32_t *dest = (uint32_t *)mImageData + (uint32_t)width * top;
     const uint8_t *src;
@@ -1183,7 +1183,7 @@ void nsJPEGXRDecoder::UpdateImage(size_t top, size_t width, size_t height)
     }
 }
 
-void nsJPEGXRDecoder::UpdateImage_AlphaOnly(size_t top, size_t width, size_t height)
+void nsJXRDecoder::UpdateImage_AlphaOnly(size_t top, size_t width, size_t height)
 {
     uint32_t *dest = (uint32_t *)mImageData + (uint32_t)width * top;
     const uint8_t *src = m_mbRowBuf;
@@ -1208,7 +1208,7 @@ void nsJPEGXRDecoder::UpdateImage_AlphaOnly(size_t top, size_t width, size_t hei
     }
 }
 
-void nsJPEGXRDecoder::DecodeAllMBRows()
+void nsJXRDecoder::DecodeAllMBRows()
 {
     size_t width, height;
     GetSize(width, height);
@@ -1227,7 +1227,7 @@ void nsJPEGXRDecoder::DecodeAllMBRows()
 }
 
 // Decode all macroblock rows with planar alpha
-void nsJPEGXRDecoder::DecodeAllMBRowsWithAlpha()
+void nsJXRDecoder::DecodeAllMBRowsWithAlpha()
 {
     size_t width = m_pDecoder->WMP.wmiI.cThumbnailWidth;
     size_t height = m_pDecoder->WMP.wmiI.cThumbnailHeight;
@@ -1245,7 +1245,7 @@ void nsJPEGXRDecoder::DecodeAllMBRowsWithAlpha()
     PostInvalidation(r);
 }
 
-void nsJPEGXRDecoder::DecodeAllMBRows_Alpha()
+void nsJXRDecoder::DecodeAllMBRows_Alpha()
 {
     size_t width = m_pDecoder->WMP.wmiI_Alpha.cThumbnailWidth;
     size_t height = m_pDecoder->WMP.wmiI_Alpha.cThumbnailHeight;
@@ -1265,7 +1265,7 @@ void nsJPEGXRDecoder::DecodeAllMBRows_Alpha()
 
 //////////////////////
 
-void nsJPEGXRDecoder::StartProgressiveDecoding(bool decodeAlpha)
+void nsJXRDecoder::StartProgressiveDecoding(bool decodeAlpha)
 {
     if (StartedDecodingMBRows())
         return;
@@ -1317,7 +1317,7 @@ void nsJPEGXRDecoder::StartProgressiveDecoding(bool decodeAlpha)
     m_startedDecodingSubband = true;
 }
 
-void nsJPEGXRDecoder::StartDecodingMBRows(bool failSafe, bool decodeAlpha)
+void nsJXRDecoder::StartDecodingMBRows(bool failSafe, bool decodeAlpha)
 {
     if (StartedDecodingMBRows())
         return;
@@ -1356,7 +1356,7 @@ void nsJPEGXRDecoder::StartDecodingMBRows(bool failSafe, bool decodeAlpha)
     m_startedDecodingMBRows = true;
 }
 
-void nsJPEGXRDecoder::StartDecodingMBRows_Alpha()
+void nsJXRDecoder::StartDecodingMBRows_Alpha()
 {
     if (StartedDecodingMBRows_Alpha())
         return;
@@ -1751,7 +1751,7 @@ static void CMYK80Alpha_RGB32(size_t width, size_t height, const void *pCMYK, si
     }
 }
 
-void nsJPEGXRDecoder::ConvertAndTransform(uint8_t *pDecoded, size_t width, size_t numLines)
+void nsJXRDecoder::ConvertAndTransform(uint8_t *pDecoded, size_t width, size_t numLines)
 {
     PKRect cr;
     cr.X = 0;
@@ -1849,7 +1849,7 @@ void nsJPEGXRDecoder::ConvertAndTransform(uint8_t *pDecoded, size_t width, size_
     }
 }
 
-bool nsJPEGXRDecoder::DecodeNextMBRow(bool invalidate, bool output)
+bool nsJXRDecoder::DecodeNextMBRow(bool invalidate, bool output)
 {
     if (FinishedDecodingMainPlane())
         return false;
@@ -1887,7 +1887,7 @@ bool nsJPEGXRDecoder::DecodeNextMBRow(bool invalidate, bool output)
     return true;
 }
 
-bool nsJPEGXRDecoder::DecodeNextMBRow_Alpha(bool invalidate)
+bool nsJXRDecoder::DecodeNextMBRow_Alpha(bool invalidate)
 {
     size_t width = m_pDecoder->WMP.wmiI_Alpha.cThumbnailWidth;
     size_t height = m_pDecoder->WMP.wmiI_Alpha.cThumbnailHeight;
@@ -1924,7 +1924,7 @@ bool nsJPEGXRDecoder::DecodeNextMBRow_Alpha(bool invalidate)
 }
 
 // Decoding with planar alpha. No need to invalidate macroblock rows.
-bool nsJPEGXRDecoder::DecodeNextMBRowWithAlpha()
+bool nsJXRDecoder::DecodeNextMBRowWithAlpha()
 {
     size_t width = m_pDecoder->WMP.wmiI_Alpha.cThumbnailWidth;
     size_t height = m_pDecoder->WMP.wmiI_Alpha.cThumbnailHeight;
@@ -1948,7 +1948,7 @@ bool nsJPEGXRDecoder::DecodeNextMBRowWithAlpha()
     return true;
 }
 
-void nsJPEGXRDecoder::DecodeNextTileRow()
+void nsJXRDecoder::DecodeNextTileRow()
 {
     size_t width, height;
     //GetSize(width, height);
@@ -1994,7 +1994,7 @@ void nsJPEGXRDecoder::DecodeNextTileRow()
     PostInvalidation(r);
 }
 
-void nsJPEGXRDecoder::EndDecodingMBRows()
+void nsJXRDecoder::EndDecodingMBRows()
 {
     if (!StartedDecodingMBRows())
         return;
@@ -2005,7 +2005,7 @@ void nsJPEGXRDecoder::EndDecodingMBRows()
     FreeMBRowBuffers();
 }
 
-void nsJPEGXRDecoder::EndDecodingMBRows_Alpha()
+void nsJXRDecoder::EndDecodingMBRows_Alpha()
 {
     if (!StartedDecodingMBRows_Alpha())
         return;
@@ -2016,7 +2016,7 @@ void nsJPEGXRDecoder::EndDecodingMBRows_Alpha()
     FreeMBRowBuffers();
 }
 
-void nsJPEGXRDecoder::FreeMBRowBuffers()
+void nsJXRDecoder::FreeMBRowBuffers()
 {
     if (nullptr != m_mbRowBuf)
     {
@@ -2032,7 +2032,7 @@ void nsJPEGXRDecoder::FreeMBRowBuffers()
     }
 }
 
-void nsJPEGXRDecoder::CreateColorTransform()
+void nsJXRDecoder::CreateColorTransform()
 {
     size_t cb = m_pDecoder->WMP.wmiDEMisc.uColorProfileByteCount;
 
@@ -2109,13 +2109,13 @@ void nsJPEGXRDecoder::CreateColorTransform()
     }
 }
 
-void nsJPEGXRDecoder::InitInternal()
+void nsJXRDecoder::InitInternal()
 {
     if (!CreateJXRStuff())
         PostDecoderError(NS_ERROR_FAILURE);
 }
 
-void nsJPEGXRDecoder::FixWrongImageSizeTag(size_t maxSize)
+void nsJXRDecoder::FixWrongImageSizeTag(size_t maxSize)
 {
     U32 byteCount = maxSize - m_pDecoder->WMP.wmiDEMisc.uImageOffset;
     m_pDecoder->WMP.wmiDEMisc.uImageByteCount = byteCount;
@@ -2158,7 +2158,7 @@ void nsJPEGXRDecoder::FixWrongImageSizeTag(size_t maxSize)
 #define DISCARD_HEAD
 EXTERN_C Bool SetCurrentTileRow(CTXSTRCODEC ctxSC, size_t tileRow);
 
-void nsJPEGXRDecoder::DoTheDecoding()
+void nsJXRDecoder::DoTheDecoding()
 {
     if (IsProgressiveDecoding())
     {
@@ -2344,7 +2344,7 @@ NextSubBand:
     }
 }
 
-void nsJPEGXRDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
+void nsJXRDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
 {
     MOZ_ASSERT(!HasError(), "Shouldn't call WriteInternal after error!");
 
@@ -2553,7 +2553,7 @@ void nsJPEGXRDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
     DoTheDecoding();
 }
 
-void nsJPEGXRDecoder::FinishInternal()
+void nsJXRDecoder::FinishInternal()
 {
     // We shouldn't be called in error cases
     MOZ_ASSERT(!HasError(), "Can't call FinishInternal on error!");

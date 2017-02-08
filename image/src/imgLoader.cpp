@@ -1157,7 +1157,7 @@ nsresult imgLoader::Init()
   }
 
   if (Preferences::GetBool("media.jxr.autoaccept", false)) {
-    UpdateJPEGXRAcceptHeader(Preferences::GetBool("media.jxr.enabled", false));
+    UpdateJXRAcceptHeader(Preferences::GetBool("media.jxr.enabled", false));
   }
 
   Preferences::AddWeakObserver(this, "media.jxr.enabled");
@@ -1191,14 +1191,14 @@ imgLoader::Observe(nsISupports* aSubject, const char* aTopic, const char16_t* aD
 #ifdef MOZ_JXR
     else if (!NS_strcmp(aData, MOZ_UTF16("media.jxr.enabled"))) {
       if (Preferences::GetBool("media.jxr.autoaccept", false)) {
-        UpdateJPEGXRAcceptHeader(Preferences::GetBool("media.jxr.enabled",
+        UpdateJXRAcceptHeader(Preferences::GetBool("media.jxr.enabled",
             false));
       }
     } else if (!NS_strcmp(aData, MOZ_UTF16("media.jxr.advertised_mime_type"))) {
       if (Preferences::GetBool("media.jxr.enabled", false) &&
           Preferences::GetBool("media.jxr.autoaccept", false)) {
-        UpdateJPEGXRAcceptHeader(false);
-        UpdateJPEGXRAcceptHeader(true);
+        UpdateJXRAcceptHeader(false);
+        UpdateJXRAcceptHeader(true);
       }
     }
 #endif
@@ -2515,7 +2515,7 @@ void imgLoader::FindMIMETypeInAcceptHeader(const char* mimeType, char* start,
 }
 
 // Adds/removes the JPEG XR MIME type to/from the "image.http.accept" pref.
-void imgLoader::UpdateJPEGXRAcceptHeader(bool enabled)
+void imgLoader::UpdateJXRAcceptHeader(bool enabled)
 {
   nsAdoptingCString accept = Preferences::GetCString("image.http.accept");
   if (!accept) {

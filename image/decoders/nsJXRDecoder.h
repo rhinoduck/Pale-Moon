@@ -25,8 +25,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef _nsJPEGXRDecoder_h
-#define _nsJPEGXRDecoder_h
+#ifndef _nsJXRDecoder_h
+#define _nsJXRDecoder_h
 
 #include "nsAutoPtr.h"
 #include "Decoder.h"
@@ -48,12 +48,12 @@ class RasterImage;
 
 #define MAX_SUBBANDS 4
 
-class nsJPEGXRDecoder : public Decoder
+class nsJXRDecoder : public Decoder
 {
 public:
 
-    nsJPEGXRDecoder(RasterImage* aImage, bool hasBeenDecoded);
-    ~nsJPEGXRDecoder();
+    nsJXRDecoder(RasterImage* aImage, bool hasBeenDecoded);
+    ~nsJXRDecoder();
 
     virtual void InitInternal();
     virtual void WriteInternal(const char *aBuffer, uint32_t aCount);
