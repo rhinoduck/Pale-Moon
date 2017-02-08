@@ -519,6 +519,7 @@ static nsExtraMimeTypeEntry extraMimeEntries [] =
   { IMAGE_JPEG, "jpeg,jpg,jfif,pjpeg,pjp", "JPEG Image" },
 #ifdef MOZ_JXR
   { IMAGE_JPEG_XR, "jxr", "JPEG-XR Image" },
+  { IMAGE_MS_PHOTO, "jxr", "JPEG-XR Image" },
 #endif
   { IMAGE_PNG, "png", "PNG Image" },
   { IMAGE_TIFF, "tiff,tif", "TIFF Image" },
