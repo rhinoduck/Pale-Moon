@@ -6,6 +6,8 @@
 #define nsWEBPDecoder_h__
 
 #include "Decoder.h"
+#include "Downscaler.h"
+#include "mozilla/Maybe.h"
 
 extern "C" {
 #include "webp/decode.h"
@@ -24,13 +26,18 @@ public:
   nsWEBPDecoder(RasterImage* aImage);
   ~nsWEBPDecoder() override;
 
+  nsresult SetTargetSize(const nsIntSize& aSize) override;
+
   void InitInternal() override;
   void WriteInternal(const char* aBuffer, uint32_t aCount) override;
   void FinishInternal() override;
 private:
+  Maybe<Downscaler> mDownscaler;
   WebPIDecoder *mDecoder;
   uint8_t *mData;          // Pointer to WebP-decoded data.
+  int mDataRowPadding;     // Buffer row stride minus row data width in bytes.
   int mPreviousLastLine;   // Last image scan-line read so far.
+  bool mContextInitialized;
 
 };
 
