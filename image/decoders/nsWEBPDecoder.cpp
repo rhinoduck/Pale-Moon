@@ -176,7 +176,7 @@ nsWEBPDecoder::WriteInternal(const char *aBuffer, uint32_t aCount)
       }
     }
 
-    mBufferRowPadding = stride - width * 4;
+    mDataRowPadding = stride - width * 4;
 
     mContextInitialized = true;
   }

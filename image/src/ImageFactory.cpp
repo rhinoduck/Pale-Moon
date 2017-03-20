@@ -36,7 +36,8 @@ ShouldDownscaleDuringDecode(const nsCString& aMimeType)
 {
   return aMimeType.EqualsLiteral(IMAGE_JPEG) ||
          aMimeType.EqualsLiteral(IMAGE_JPG) ||
-         aMimeType.EqualsLiteral(IMAGE_PJPEG);
+         aMimeType.EqualsLiteral(IMAGE_PJPEG) ||
+         aMimeType.EqualsLiteral(IMAGE_WEBP);
 }
 
 static uint32_t
